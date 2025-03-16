@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     git \
     build-essential \
-    g++
+    g++ \
+    zstd 
 
 # set up pip
 RUN pip install --upgrade pip 
@@ -28,3 +29,11 @@ RUN wget https://github.com/official-stockfish/Stockfish/releases/latest/downloa
 # set up stockfish
 RUN chmod +x /stockfish/stockfish-ubuntu-x86-64-sse41-popcnt
 ENV STOCKFISH_PATH=/stockfish/stockfish-ubuntu-x86-64-sse41-popcnt
+
+# Getting the chess puzzles
+RUN wget https://database.lichess.org/lichess_db_puzzle.csv.zst 
+RUN zstd -d lichess_db_puzzle.csv.zst
+RUN mkdir -p /data
+RUN mv lichess_db_puzzle.csv /data/puzzles.csv
+RUN rm -rf lichess_db_puzzle.csv.zst
+ENV PUZZLE_PATH=/data/puzzles.csv

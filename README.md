@@ -16,19 +16,28 @@ This repository contains a development environment for the Chess LLM project. Th
    cd chess-llm
    ```
 
-2. **Open the folder in VS Code**.
+2. **Update Environment Variables**  
+   Copy the `example.env` file to create your own `.env` file and update the keys accordingly:
 
-3. **Open the project in a Dev Container**:
+   ```bash
+   cp example.env .env
+   ```
+
+   Open the `.env` file in your editor and adjust the values before starting Docker.
+
+3. **Open the folder in VS Code**.
+
+4. **Open the project in a Dev Container**:
 
    - Press <kbd>F1</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> to open the command palette.
    - Search for and select **Remote-Containers: Open Folder in Container...** (or **Dev Containers: Open Folder in Container...** if you’re using a newer version of the extension).
    - Choose the folder containing this repository.
 
-4. **Wait for the environment to build**. VS Code will:
+5. **Wait for the environment to build**. VS Code will:
 
    - Pull the appropriate Docker image (if not already available).
    - Install any required packages/extensions.
 
-5. After the container finishes setting up, you should be good to go! You can start exploring the code.
+6. After the container finishes setting up, you should be good to go! You can start exploring the code.
 
 ## Project Structure

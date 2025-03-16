@@ -1,2 +1,6 @@
 ipykernel
 chess
+pandas
+matplotlib
+numpy
+requests
