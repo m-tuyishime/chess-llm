@@ -3,5 +3,7 @@ chess
 pandas
 matplotlib
 numpy
-requests
+aiosqlite
+aiohttp
 glicko2
+aiolimiter
