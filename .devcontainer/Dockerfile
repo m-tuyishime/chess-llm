@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
     g++ \
-    zstd 
+    zstd \
+    sqlite3 \
+    libsqlite3-dev 
 
 # set up pip
 RUN pip install --upgrade pip 
