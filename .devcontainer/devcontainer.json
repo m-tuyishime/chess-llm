@@ -9,7 +9,8 @@
         "ms-python.python",
         "ms-toolsai.jupyter",
         "esbenp.prettier-vscode",
-        "alexcvzz.vscode-sqlite"
+        "alexcvzz.vscode-sqlite",
+        "qwtel.sqlite-viewer"
       ]
     }
   }
