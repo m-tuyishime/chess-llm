@@ -128,43 +128,37 @@ class ReportGenerator:
 
     def illegal_moves_distribution(self): 
         """
-        Generate a pie chart showing the normalized distribution of illegal moves by model.
-        The ratio is computed as (illegal_moves_count / total_games) for each model.
+        Generate a bar chart showing the percentage of illegal moves by model.
+        The percentage is computed as (illegal_moves_count / total_moves) * 100 for each model.
         """ 
         df = self.db_manager.get_illegal_moves_data()
         if df.empty:
             print("No illegal moves data available.")
             return
 
-        # Separate models with non-zero and zero illegal moves.
-        df_nonzero = df[df["illegal_moves_count"] > 0].copy()
-        df_zero = df[df["illegal_moves_count"] == 0].copy()
+        # Calculate illegal moves percentage for all models
+        df["illegal_percentage"] = (df["illegal_moves_count"] / df["total_moves"]) * 100
+        
+        # Sort by percentage for better visualization
+        df = df.sort_values("illegal_percentage", ascending=False)
 
-        if df_nonzero.empty:
-            print("No models with illegal moves found. All evaluated models had zero illegal moves.")
-            plt.figure(figsize=(8, 8))
-            plt.pie([1], labels=["No illegal moves"], autopct="%1.1f%%", startangle=140)
-            plt.title("Normalized Illegal Moves Distribution by Model")
-            plt.show()
-            return
-
-        # Calculate normalized illegal moves ratio per model for models with non-zero illegal moves.
-        df_nonzero["illegal_ratio"] = df_nonzero["illegal_moves_count"] / df_nonzero["total_games"]
-
-        fig, ax = plt.subplots(figsize=(8, 8))
-        ax.pie(
-            df_nonzero["illegal_ratio"],
-            labels=df_nonzero["agent_name"],
-            autopct="%1.1f%%",
-            startangle=140
-        )
-        plt.title("Normalized Illegal Moves Distribution by Model")
-
-        # Annotate the chart with models evaluated that had zero illegal moves.
-        if not df_zero.empty:
-            zero_models = ", ".join(df_zero["agent_name"].tolist())
-            plt.figtext(0.5, 0.01, f"Evaluated with zero illegal moves: {zero_models}", ha="center", fontsize=9, wrap=True)
-
+        plt.figure(figsize=(10, 6))
+        bars = plt.bar(df["agent_name"], df["illegal_percentage"], color="coral")
+        
+        # Add percentage labels on top of bars
+        for bar in bars:
+            height = bar.get_height()
+            plt.text(bar.get_x() + bar.get_width()/2., height + 0.3,
+                    f'{height:.1f}%',
+                    ha='center', va='bottom', rotation=0)
+            
+        plt.xlabel("Model Name")
+        plt.ylabel("Illegal Moves (%)")
+        plt.title("Percentage of Illegal Moves by Model")
+        plt.xticks(rotation=45, ha="right")
+        plt.ylim(0, max(df["illegal_percentage"]) * 1.1)  # Add some space for labels
+        plt.grid(axis="y", linestyle="--", alpha=0.7)
+        plt.tight_layout()
         plt.show()
 
     def final_ratings_intervals(self):

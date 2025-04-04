@@ -254,24 +254,18 @@ class DatabaseManager:
     
     def get_illegal_moves_data(self) -> pd.DataFrame:
         """
-        Get the number of illegal moves and total games for each agent.
+        Get the number of moves and the number of illegal moves for each model (non-random agents).
+        Returns columns: agent_name, total_moves, illegal_moves_count.
         """
         query = """
-            SELECT tg.agent_name, 
-                COALESCE(im.illegal_moves_count, 0) as illegal_moves_count, 
-                tg.total_games
-            FROM (
-                SELECT agent_name, COUNT(*) as total_games
-                FROM game
-                GROUP BY agent_name
-            ) tg
-            LEFT JOIN (
-                SELECT g.agent_name, COUNT(m.id) as illegal_moves_count
-                FROM move m
-                JOIN game g ON m.game_id = g.id
-                WHERE m.illegal_move = 1
-                GROUP BY g.agent_name
-            ) im ON tg.agent_name = im.agent_name
+            SELECT a.name as agent_name,
+                COUNT(m.id) as total_moves,
+                COALESCE(SUM(CASE WHEN m.illegal_move = 1 THEN 1 ELSE 0 END), 0) as illegal_moves_count
+            FROM agent a
+            JOIN game g ON a.name = g.agent_name
+            JOIN move m ON g.id = m.game_id
+            WHERE a.random = 0
+            GROUP BY a.name
         """
         df = pd.read_sql_query(query, self.conn)
         return df

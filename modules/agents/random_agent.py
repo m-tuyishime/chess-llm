@@ -11,7 +11,7 @@ class RandomAgent(Agent):
     model_name = "random_agent"
 
     def __init__(self):
-        super().__init__(self.model_name, is_reasoning=False)
+        super().__init__(self.model_name, is_random=True, is_reasoning=False)
         self.logger = logging.getLogger(f'chess_benchmark.random_agent.{self.model_name}')
         self.logger.info(f"Initializing RandomAgent with model name: {self.model_name}")
 
