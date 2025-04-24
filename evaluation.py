@@ -1,56 +1,48 @@
 import os
 import asyncio
 
-from modules import setup_logging, Router, LLMAgent, RandomAgent, PuzzleSelector, Evaluator
+from modules import setup_logging, Router, LLMAgent, RandomAgent, PuzzleSelector, Evaluator, StockfishAgent
 
 # ---------------------------
 # Main
 # ---------------------------
 async def main():
     # Create the logger
-    logger = setup_logging()
+    setup_logging()
 
-    open_router_url = "https://openrouter.ai/api/v1/chat/completions"
+    open_router_url = "https://openrouter.ai/api/v1"
     open_router_key = os.getenv('OPENROUTER_API_KEY')
 
-    nim_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    nim_url = "https://integrate.api.nvidia.com/v1"
     nim_key = os.getenv('NIM_API_KEY')
     
     # Initialize Router
     open_router = Router(open_router_url, open_router_key)
     nim_router = Router(nim_url, nim_key, 40)
 
-    # Initialize LLM models (simulate five different models)
-    # Free llms from OpenRouter 20 rpm/200 rpd
-    or_free_models = [
-        LLMAgent("google/gemini-2.0-pro-exp-02-05:free", True, open_router, 1),
-        LLMAgent("google/gemini-2.5-pro-exp-03-25:free", True, open_router, 1),
-        LLMAgent("deepseek/deepseek-v3-base:free", False, open_router, 12),
-    ]
 
-    or_cheap_models = [
-        LLMAgent("meta-llama/llama-3.1-8b-instruct", False, open_router)
-    ]
 
     nim_models = [
-        LLMAgent("deepseek-ai/deepseek-r1", True, nim_router),
-        LLMAgent("qwen/qwq-32b", True, nim_router),
-        LLMAgent("deepseek-ai/deepseek-r1-distill-llama-8b", False, nim_router),
-        LLMAgent("meta/llama-3.1-405b-instruct", False, nim_router),
-        LLMAgent("google/gemma-3-27b-it", False, nim_router),
+        LLMAgent(nim_router, "nvidia/llama-3.1-nemotron-ultra-253b-v1", True),
+        LLMAgent(nim_router, "meta/llama-3.1-405b-instruct", False),
+        LLMAgent(nim_router, "google/gemma-3-27b-it", False),
+        LLMAgent(nim_router, "meta/llama-3.1-8b-instruct", False),
+        LLMAgent(nim_router, "meta/llama-4-maverick-17b-128e-instruct", False),
+        # LLMAgent(nim_router, "deepseek-ai/deepseek-r1", True),
     ]
 
-    random_agent = [
-        RandomAgent()
+    other_agents = [
+        RandomAgent(), 
+        StockfishAgent(level=1),
     ]
     
     # Initialize puzzle selector
     puzzle_selector = PuzzleSelector()
     # Distribute puzzles individually: each model gets puzzles it has not yet seen.
-    evaluators = [Evaluator(llm, puzzle_selector.get_puzzles_for_model(llm)) for llm in nim_models + or_cheap_models + random_agent]
+    evaluators = [Evaluator(llm, puzzle_selector.get_puzzles_for_model(llm)) for llm in nim_models + other_agents]
     
     # Evaluate concurrently for all evaluators
-    await asyncio.gather(*[evaluator.evaluate_all(target_deviation=50) for evaluator in evaluators])
+    await asyncio.gather(*[evaluator.evaluate_all() for evaluator in evaluators])
 
 if __name__ == "__main__":
     asyncio.run(main())

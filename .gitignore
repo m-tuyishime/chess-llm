@@ -1,5 +1,5 @@
 data/puzzles.csv
-data/storage.db
+data/storage.db-*
 .env
 __pycache__
 logs

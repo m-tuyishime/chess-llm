@@ -3,6 +3,17 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "jupyter",
   "workspaceFolder": "/app",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "runArgs": [
+    // pick up host TZ
+    "-v",
+    "/etc/localtime:/etc/localtime:ro",
+    "-v",
+    "/etc/timezone:/etc/timezone:ro"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [

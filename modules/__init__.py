@@ -4,7 +4,7 @@ from .evaluator import Evaluator
 from .database_manager import DatabaseManager
 from .puzzle_selector import PuzzleSelector
 from .router import Router
-from .agents import LLMAgent, RandomAgent
+from .agents import LLMAgent, RandomAgent, StockfishAgent
 from .report_generator import ReportGenerator
 
 __all__ = [
@@ -16,5 +16,6 @@ __all__ = [
     "Router",
     "LLMAgent",
     "RandomAgent",
+    "StockfishAgent",
     "ReportGenerator"
 ]

@@ -12,18 +12,18 @@ class DatabaseManager:
     _instance = None
 
     # Singleton pattern to ensure only one instance of DatabaseManager
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(DatabaseManager, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self):
-        if self._initialized:
+    def __init__(self, db_path: str = os.getenv("DB_PATH", "data/storage.db")):
+        if self._initialized and db_path == self.db_path:
             return # Do not reinitialize if instance already exists
         
         self.logger = logging.getLogger('chess_benchmark.database')
-        self.db_path = os.getenv("DB_PATH", "data/storage.db")
+        self.db_path = db_path
         self.logger.info(f"Initializing database at {self.db_path}")
         
         # Ensure directory exists
@@ -32,6 +32,12 @@ class DatabaseManager:
         try:
             self.conn = sqlite3.connect(self.db_path)
             self.cursor = self.conn.cursor()
+
+            # Enable foreign key constraints
+            self.cursor.execute("PRAGMA foreign_keys = ON;")
+            # Enable WAL mode for better concurrency
+            self.cursor.execute("PRAGMA journal_mode=WAL;")
+
             self.create_tables()
             self._initialized = True
             self.logger.info("Database initialized successfully")
@@ -44,9 +50,6 @@ class DatabaseManager:
         """
         Create the necessary tables in the database.
         """
-        # Enable foreign key constraints
-        self.cursor.execute("PRAGMA foreign_keys = ON;")
-        
         # Create puzzle table
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS puzzle (
@@ -76,18 +79,19 @@ class DatabaseManager:
         # Create game table 
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS game (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 puzzle_id TEXT REFERENCES puzzle(id) ON DELETE CASCADE,
                 agent_name TEXT REFERENCES agent(name) ON DELETE CASCADE,
                 date TEXT DEFAULT CURRENT_TIMESTAMP,
-                failed BOOLEAN
+                failed BOOLEAN,
+                UNIQUE(puzzle_id, agent_name)
             )
         ''')
         
         # Create move table to store all moves (both opponent and agent)
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS move (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 game_id INTEGER REFERENCES game(id) ON DELETE CASCADE,
                 fen TEXT,
                 correct_move TEXT,
@@ -97,15 +101,24 @@ class DatabaseManager:
                 illegal_move BOOLEAN
             )
         ''')
+
+        # Add a partial unique index to prevent duplicate legal moves
+        # This ensures that the combination of game_id, fen, and move is unique ONLY when illegal_move is 0 (False)
+        self.cursor.execute('''
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_legal_move 
+            ON move (game_id, fen, move) 
+            WHERE illegal_move = 0; 
+        ''')
         
         # Create benchmark table 
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS benchmark (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 game_id INTEGER REFERENCES game(id) ON DELETE CASCADE,
                 agent_rating INTEGER,
                 agent_deviation INTEGER,
-                agent_volatility INTEGER
+                agent_volatility INTEGER,
+                UNIQUE(game_id)
             )
         ''')
         
@@ -140,15 +153,37 @@ class DatabaseManager:
 
     def create_game(self, puzzle_id: str, agent_name: str) -> int:
         """
-        Create a new game entry in the database.
-        Returns the ID of the new game.
+        Create a new game entry in the database or retrieve the existing one.
+        Returns the ID of the game.
         """
-        self.cursor.execute(
-            "INSERT INTO game (puzzle_id, agent_name) VALUES (?, ?)",
-            (puzzle_id, agent_name)
-        )
-        self.conn.commit()
-        return self.cursor.lastrowid
+        try:
+            # Attempt to insert the game, ignoring if it already exists
+            self.cursor.execute(
+                "INSERT OR IGNORE INTO game (puzzle_id, agent_name) VALUES (?, ?)",
+                (puzzle_id, agent_name)
+            )
+            self.conn.commit()
+
+            # Whether inserted or ignored, fetch the actual game ID
+            self.cursor.execute(
+                "SELECT id FROM game WHERE puzzle_id = ? AND agent_name = ?",
+                (puzzle_id, agent_name)
+            )
+            result = self.cursor.fetchone()
+
+            if result:
+                game_id = result[0]
+                return game_id
+            else:
+                # This should theoretically not happen if INSERT OR IGNORE worked correctly
+                self.logger.error(f"Could not find game ID for puzzle {puzzle_id} and agent {agent_name} after INSERT OR IGNORE.")
+                raise ValueError("Failed to create or find game entry.")
+
+        except sqlite3.Error as e:
+            self.logger.error(f"Database error in create_game for puzzle {puzzle_id}, agent {agent_name}: {e}")
+            self.logger.error(traceback.format_exc())
+            self.conn.rollback() # Rollback in case of other errors
+            raise
 
     def save_move(self, game_id: int, fen: str, correct_move: str, move: str, prompt_tokens: int, completion_tokens: int, illegal_move: bool):
         """
@@ -173,7 +208,7 @@ class DatabaseManager:
     # update the game table with the puzzle outcome (failed: True/False)
     def update_game_result(self, game_id: int, failed: bool):
         self.cursor.execute(
-            "UPDATE game SET failed = ? WHERE id = ?",
+            "UPDATE game SET failed = ?, date = CURRENT_TIMESTAMP WHERE id = ?",
             (failed, game_id)
         )
         self.conn.commit()
@@ -183,25 +218,34 @@ class DatabaseManager:
         """
         Get puzzles that have not been completed by a specific agent.
         """
-        # Delete uncompleted games
-        self.cursor.execute("DELETE FROM game WHERE failed = NULL")
-        self.conn.commit()
-
         # Get puzzles that have not been completed by the agent
         query = '''
             SELECT p.*
             FROM puzzle p
             LEFT JOIN game g ON p.id = g.puzzle_id AND g.agent_name = ?
-            WHERE g.id IS NULL
+            WHERE g.id IS NULL OR g.failed IS NULL
         '''
         self.cursor.execute(query, (agent_name,))
         rows = self.cursor.fetchall()
 
         if not rows:
+            self.logger.info(f"No uncompleted puzzles found for agent {agent_name}.")
             return None
 
         # Convert rows to DataFrame
         columns = [col[0] for col in self.cursor.description]
+        # Delete the moves for the uncompleted puzzles
+        query = '''
+            DELETE FROM move
+            WHERE game_id IN (
+                SELECT g.id
+                FROM game g
+                WHERE g.agent_name = ? AND g.failed IS NULL
+            )
+        '''
+        self.cursor.execute(query, (agent_name,))
+        self.conn.commit()
+
         return pd.DataFrame(rows, columns=columns)
     
     def get_puzzles(self) -> Optional[pd.DataFrame]:
@@ -224,7 +268,7 @@ class DatabaseManager:
         query = '''
             SELECT b.agent_rating, b.agent_deviation, b.agent_volatility
             FROM benchmark b
-            JOIN game g ON b.game_id = g.id
+            LEFT JOIN game g ON g.id = b.game_id
             WHERE g.agent_name = ?
             ORDER BY b.id DESC LIMIT 1
         '''
@@ -244,10 +288,10 @@ class DatabaseManager:
                 b.agent_rating, 
                 b.agent_deviation, 
                 b.agent_volatility, 
-                ROW_NUMBER() OVER(PARTITION BY g.agent_name ORDER BY g.date, b.id) as evaluation_index
+                ROW_NUMBER() OVER(PARTITION BY g.agent_name ORDER BY b.id) as evaluation_index
             FROM benchmark b
-            JOIN game g ON b.game_id = g.id
-            ORDER BY g.date, b.id
+            LEFT JOIN game g ON g.id = b.game_id
+            ORDER BY b.id
         """
         df = pd.read_sql_query(query, self.conn, parse_dates=["date"])
         return df
@@ -359,6 +403,7 @@ class DatabaseManager:
     def get_token_usage_per_move_data(self) -> pd.DataFrame:
         """
         Get average token usage per move for each agent.
+        Excludes agents that have token usage of 0 for both prompt and completion.
         Returns columns: agent_name, avg_prompt_tokens, avg_completion_tokens
         """
         query = """
@@ -369,12 +414,14 @@ class DatabaseManager:
             JOIN game g ON m.game_id = g.id
             WHERE m.prompt_tokens IS NOT NULL AND m.completion_tokens IS NOT NULL
             GROUP BY g.agent_name
+            HAVING AVG(m.prompt_tokens) > 0 AND AVG(m.completion_tokens) > 0
         """
         return pd.read_sql_query(query, self.conn)
     
     def get_token_usage_per_puzzle_data(self) -> pd.DataFrame:
         """
         Get average token usage per puzzle for each agent.
+        Excludes agents that have token usage of 0 for both prompt and completion.
         Returns columns: agent_name, avg_puzzle_prompt_tokens, avg_puzzle_completion_tokens
         """
         query = """
@@ -392,6 +439,7 @@ class DatabaseManager:
                 GROUP BY g.id, g.agent_name
             ) puzzle_tokens
             GROUP BY agent_name
+            HAVING AVG(total_prompt) > 0 AND AVG(total_completion) > 0
         """
         return pd.read_sql_query(query, self.conn)
     
