@@ -1,5 +1,7 @@
 # LLM Chess Puzzle Performance Analysis
 
+> A comparative benchmark study evaluating Large Language Models' ability to solve chess puzzles using the Glicko-2 rating system.
+
 ## Overview
 
 This project presents a comparative analysis of the performance of various Large Language Models (LLMs) in solving chess puzzles. An automated evaluation system was developed using Python to benchmark different LLMs against a diverse set of chess puzzles sourced from the Lichess database, categorized by themes like "End Game", "Strategic", and "Tactic". The system employs the Glicko-2 rating system to estimate and compare the playing strength of the models in a manner comparable to human chess ratings.
