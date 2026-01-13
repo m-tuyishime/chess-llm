@@ -12,36 +12,36 @@
 
 ### 1.1 Project Setup
 
-- [ ] Create `pyproject.toml` with:
+- [x] Create `pyproject.toml` with:
   - Package metadata
   - Ruff configuration (strict rules)
   - Mypy configuration (`strict = true`)
   - Dev dependencies (pytest, ruff, mypy)
-- [ ] Add `py.typed` marker for PEP 561 compliance
-- [ ] Set up pre-commit hooks (ruff, mypy)
+- [x] Add `py.typed` marker for PEP 561 compliance
+- [x] Set up pre-commit hooks (ruff, mypy)
 
 ### 1.2 Define Interfaces (Protocols)
 
-- [ ] `Agent` protocol in `agents/base.py`
-- [ ] `GameRepository` protocol in `data/protocols.py`
-- [ ] `LLMProvider` protocol in `providers/base.py`
-- [ ] Core data models as `@dataclass` in `data/models.py`:
+- [x] `Agent` protocol in `agents/base.py`
+- [x] `GameRepository` protocol in `data/protocols.py`
+- [x] `LLMProvider` protocol in `providers/base.py`
+- [x] Core data models as `@dataclass` in `data/models.py`:
   - `Puzzle`, `Game`, `Move`, `AgentRanking`, `GameReplay`
 
 ### 1.3 Refactor Existing Code
 
-- [ ] Move `chess_env.py` → `core/chess_env.py`
-- [ ] Move `evaluator.py` → `core/evaluator.py`
-- [ ] Move `database_manager.py` → `data/sqlite.py` (implement `GameRepository`)
-- [ ] Move agents → `agents/` with proper inheritance
-- [ ] Move router → `providers/openrouter.py` (implement `LLMProvider`)
+- [x] Move `chess_env.py` → `core/chess_env.py`
+- [x] Move `evaluator.py` → `core/evaluator.py`
+- [x] Move `database_manager.py` → `data/sqlite.py` (implement `GameRepository`)
+- [x] Move agents → `agents/` with proper inheritance
+- [x] Move router → `providers/openrouter.py` (implement `LLMProvider`)
 
 ### 1.4 Documentation & Types
 
-- [ ] Add Google-style docstrings to all public functions
-- [ ] Document all parameters, returns, and exceptions
-- [ ] Ensure 100% mypy compliance
-- [ ] Ensure 0 ruff errors
+- [x] Add Google-style docstrings to all public functions
+- [x] Document all parameters, returns, and exceptions
+- [x] Ensure 100% mypy compliance
+- [x] Ensure 0 ruff errors
 
 ### 1.5 Testing
 
@@ -49,7 +49,14 @@
 - [ ] Add unit tests for protocols with mock implementations
 - [ ] Verify `pip install -e .` works locally
 
-**Week 1 Deliverable**: Installable library with clean interfaces and full type coverage
+### 1.6 Pipeline Validation Run
+
+- [ ] Run 3 models (via NVIDIA NIM/OpenRouter) on 3 chess puzzles each
+- [ ] Verify end-to-end pipeline: Agent → Evaluator → SQLiteRepository
+- [ ] Store results to verify compatibility with future website backend
+- [ ] Compare performance/reasoning against research paper baseline
+
+**Week 1 Deliverable**: Installable library with clean interfaces, full type coverage, and validated pipeline run.
 
 ---
 
