@@ -1,0 +1,228 @@
+# Chess-LLM Arena Roadmap
+
+> **Target**: Portfolio MVP hosted on subdomain  
+> **Timeline**: 4 weeks (January 13 – February 10, 2026)  
+> **Paper**: [docs/report.pdf](file:///e:/tuyis/code/School/chess-llm/docs/report.pdf)
+
+---
+
+## Week 1: Library Refactoring (Jan 13–19)
+
+> **Goal**: Extract `modules/` into a clean, typed, documented `chess_llm_eval` library
+
+### 1.1 Project Setup
+
+- [ ] Create `pyproject.toml` with:
+  - Package metadata
+  - Ruff configuration (strict rules)
+  - Mypy configuration (`strict = true`)
+  - Dev dependencies (pytest, ruff, mypy)
+- [ ] Add `py.typed` marker for PEP 561 compliance
+- [ ] Set up pre-commit hooks (ruff, mypy)
+
+### 1.2 Define Interfaces (Protocols)
+
+- [ ] `Agent` protocol in `agents/base.py`
+- [ ] `GameRepository` protocol in `data/protocols.py`
+- [ ] `LLMProvider` protocol in `providers/base.py`
+- [ ] Core data models as `@dataclass` in `data/models.py`:
+  - `Puzzle`, `Game`, `Move`, `AgentRanking`, `GameReplay`
+
+### 1.3 Refactor Existing Code
+
+- [ ] Move `chess_env.py` → `core/chess_env.py`
+- [ ] Move `evaluator.py` → `core/evaluator.py`
+- [ ] Move `database_manager.py` → `data/sqlite.py` (implement `GameRepository`)
+- [ ] Move agents → `agents/` with proper inheritance
+- [ ] Move router → `providers/openrouter.py` (implement `LLMProvider`)
+
+### 1.4 Documentation & Types
+
+- [ ] Add Google-style docstrings to all public functions
+- [ ] Document all parameters, returns, and exceptions
+- [ ] Ensure 100% mypy compliance
+- [ ] Ensure 0 ruff errors
+
+### 1.5 Testing
+
+- [ ] Port existing tests to pytest
+- [ ] Add unit tests for protocols with mock implementations
+- [ ] Verify `pip install -e .` works locally
+
+**Week 1 Deliverable**: Installable library with clean interfaces and full type coverage
+
+---
+
+## Week 2: Backend Server (Jan 20–26)
+
+> **Goal**: FastAPI server exposing chess data via REST API
+
+### 2.1 Server Setup
+
+- [ ] Create `website/server/` structure
+- [ ] Set up FastAPI app with CORS for portfolio subdomain
+- [ ] Configure Pydantic v2 for request/response schemas
+- [ ] Add ESLint-equivalent linting (ruff for Python)
+
+### 2.2 API Endpoints
+
+- [ ] `GET /api/leaderboard` → List agents by rating
+- [ ] `GET /api/agents/{name}` → Agent details + game list
+- [ ] `GET /api/games/{id}` → Full replay with moves
+- [ ] `GET /api/puzzles/{id}` → Puzzle metadata
+
+### 2.3 Dependency Injection
+
+- [ ] Create `dependencies.py` with:
+  - `get_repository()` → Returns `SQLiteRepository`
+  - Easy swap to PostgreSQL later
+- [ ] Wire repositories into route handlers
+
+### 2.4 Data Validation
+
+- [ ] Define Pydantic schemas in `schemas.py`
+- [ ] Validate all responses match expected structure
+- [ ] Add error handling middleware
+
+### 2.5 Testing
+
+- [ ] Integration tests with TestClient
+- [ ] Verify all endpoints return correct data
+- [ ] Test error cases (404, invalid params)
+
+**Week 2 Deliverable**: Fully functional API serving real data from SQLite
+
+---
+
+## Week 3: Frontend Client (Jan 27 – Feb 2)
+
+> **Goal**: TypeScript SPA with all pages functional
+
+### 3.1 Project Setup
+
+- [ ] Create `website/client/` with Vite + TypeScript
+- [ ] Configure ESLint + Prettier with strict rules
+- [ ] Set up `tsconfig.json` with `strict: true`
+- [ ] Add client-side router
+
+### 3.2 API Integration
+
+- [ ] Create typed API client in `api/client.ts`
+- [ ] Define TypeScript interfaces matching backend schemas
+- [ ] Add loading/error states for all queries
+
+### 3.3 Leaderboard Page (`/`)
+
+- [ ] Fetch and render agent rankings
+- [ ] Display: Rank, Model, Rating ±RD, Win Rate
+- [ ] Make rows clickable → navigate to agent detail
+- [ ] Responsive table design
+
+### 3.4 Agent Detail Page (`/agent/:name`)
+
+- [ ] Display agent summary (rating, games played, win rate)
+- [ ] List all puzzles attempted with outcomes
+- [ ] Filter by puzzle type and outcome
+- [ ] Paginate results
+
+### 3.5 Puzzle Replay Page (`/replay/:gameId`)
+
+- [ ] Integrate chess board library (chessground or chessboardjs)
+- [ ] Step through moves with keyboard/buttons
+- [ ] Highlight expected vs actual moves
+- [ ] Show illegal move attempts
+- [ ] Display puzzle metadata sidebar
+
+### 3.6 About Page (`/about`)
+
+- [ ] Research abstract (from report.pdf)
+- [ ] Methodology explanation
+- [ ] Link to full paper PDF
+- [ ] Author credits
+
+**Week 3 Deliverable**: Complete SPA with all 4 pages functional
+
+---
+
+## Week 4: Integration & Polish (Feb 3–10)
+
+> **Goal**: Production-ready deployment on portfolio subdomain
+
+### 4.1 Integration
+
+- [ ] Connect frontend to backend in development
+- [ ] Configure production build settings
+- [ ] Set up environment variables
+
+### 4.2 UI Polish
+
+- [ ] Consistent design system (colors, typography, spacing)
+- [ ] Dark/light mode toggle
+- [ ] Smooth page transitions
+- [ ] Loading skeletons
+- [ ] 404 and error pages
+
+### 4.3 Accessibility & SEO
+
+- [ ] Semantic HTML throughout
+- [ ] ARIA labels for interactive elements
+- [ ] Meta tags (title, description, OpenGraph)
+- [ ] Keyboard navigation
+
+### 4.4 Deployment
+
+- [ ] Configure for portfolio subdomain
+- [ ] Set up CI/CD (GitHub Actions)
+- [ ] Deploy backend (container or serverless)
+- [ ] Deploy frontend (static hosting)
+- [ ] Verify CORS and API connections
+
+### 4.5 Documentation
+
+- [ ] Update README with live site link
+- [ ] Document local development setup
+- [ ] Add screenshots to README
+
+**Week 4 Deliverable**: Live portfolio project at `chess.yourdomain.com`
+
+---
+
+## Timeline Overview
+
+```mermaid
+gantt
+    title 4-Week MVP Timeline
+    dateFormat YYYY-MM-DD
+    section Week 1
+    Library Refactoring    :w1, 2026-01-13, 7d
+    section Week 2
+    Backend Server         :w2, after w1, 7d
+    section Week 3
+    Frontend Client        :w3, after w2, 7d
+    section Week 4
+    Integration & Deploy   :w4, after w3, 7d
+```
+
+---
+
+## Success Criteria
+
+| Criterion     | Target                      |
+| ------------- | --------------------------- |
+| Library types | 100% mypy strict compliance |
+| Library lint  | 0 ruff errors               |
+| Frontend lint | 0 ESLint errors             |
+| API coverage  | All 4 endpoints functional  |
+| Pages         | All 4 pages complete        |
+| Deployment    | Live on portfolio subdomain |
+
+---
+
+## Interface Points (Future-Proofing)
+
+| Interface        | Current Impl             | Future Impl             |
+| ---------------- | ------------------------ | ----------------------- |
+| `GameRepository` | SQLiteRepository         | PostgresRepository      |
+| `LLMProvider`    | OpenRouterProvider       | AnthropicProvider, etc. |
+| `Agent`          | LLMAgent, StockfishAgent | UserAgent (live play)   |
+| Hosting          | Static + SQLite          | Kubernetes + Postgres   |

@@ -3,3 +3,4 @@ data/storage.db-*
 .env
 __pycache__
 logs
+docs/*.pdf
