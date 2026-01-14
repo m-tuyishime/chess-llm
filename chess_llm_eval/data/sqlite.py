@@ -1,6 +1,7 @@
 import contextlib
 import logging
 import sqlite3
+
 import pandas as pd
 
 from chess_llm_eval.data.models import AgentData, AgentRanking, Game, MoveRecord, Puzzle
@@ -362,11 +363,11 @@ class SQLiteRepository:
         and evaluation_index which is the sequential number of evaluations for each agent.
         """
         query = """
-            SELECT 
-                g.agent_name, 
-                b.agent_rating, 
-                b.agent_deviation, 
-                b.agent_volatility, 
+            SELECT
+                g.agent_name,
+                b.agent_rating,
+                b.agent_deviation,
+                b.agent_volatility,
                 ROW_NUMBER() OVER(PARTITION BY g.agent_name ORDER BY b.id) as evaluation_index
             FROM benchmark b
             LEFT JOIN game g ON g.id = b.game_id
@@ -394,7 +395,7 @@ class SQLiteRepository:
         A puzzle is considered failed if the game.failed field is True.
         """
         group_cols = "g.agent_name, p.type" if group_by_agent else "p.type"
-        
+
         query = f"""
             SELECT {group_cols},
                 SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) as successes,
@@ -413,7 +414,9 @@ class SQLiteRepository:
         query = """
             SELECT a.name as agent_name,
                 COUNT(m.id) as total_moves,
-                COALESCE(SUM(CASE WHEN m.illegal_move = 1 THEN 1 ELSE 0 END), 0) as illegal_moves_count
+                COALESCE(
+                    SUM(CASE WHEN m.illegal_move = 1 THEN 1 ELSE 0 END), 0
+                ) as illegal_moves_count
             FROM agent a
             JOIN game g ON a.name = g.agent_name
             JOIN move m ON g.id = m.game_id
@@ -449,7 +452,7 @@ class SQLiteRepository:
         Returns a tuple (weighted_rating, weighted_rd).
         """
         cursor = self.conn.execute("""
-            SELECT 
+            SELECT
                 SUM(rating * popularity) * 1.0 / SUM(popularity) as weighted_rating,
                 SUM(rating_deviation * popularity) * 1.0 / SUM(popularity) as weighted_rd
             FROM puzzle
@@ -483,7 +486,7 @@ class SQLiteRepository:
         Returns columns: agent_name, avg_prompt_tokens, avg_completion_tokens
         """
         query = """
-            SELECT g.agent_name, 
+            SELECT g.agent_name,
                    AVG(m.prompt_tokens) as avg_prompt_tokens,
                    AVG(m.completion_tokens) as avg_completion_tokens
             FROM move m
@@ -501,13 +504,13 @@ class SQLiteRepository:
         Returns columns: agent_name, avg_puzzle_prompt_tokens, avg_puzzle_completion_tokens
         """
         query = """
-            SELECT agent_name, 
+            SELECT agent_name,
                    AVG(total_prompt) as avg_puzzle_prompt_tokens,
                    AVG(total_completion) as avg_puzzle_completion_tokens
             FROM (
-                SELECT g.id as game_id, 
+                SELECT g.id as game_id,
                        g.agent_name as agent_name,
-                       SUM(m.prompt_tokens) as total_prompt, 
+                       SUM(m.prompt_tokens) as total_prompt,
                        SUM(m.completion_tokens) as total_completion
                 FROM game g
                 JOIN move m ON m.game_id = g.id
@@ -521,16 +524,18 @@ class SQLiteRepository:
 
     def get_solutionary_moves_data(self) -> pd.DataFrame:
         """
-        Retrieve solutionnary puzzle moves data joined with corresponding legal moves for each agent.
-        Returns columns: agent_name, themes, puzzle_rating, puzzle_deviation, moves, agent_moves.
+        Retrieve solutionnary puzzle moves data joined with
+        corresponding legal moves for each agent.
+        Returns columns: agent_name, themes, puzzle_rating,
+        puzzle_deviation, moves, agent_moves.
         """
         query = """
-            SELECT 
-                g.agent_name, 
+            SELECT
+                g.agent_name,
                 p.type,
-                p.rating as puzzle_rating, 
+                p.rating as puzzle_rating,
                 p.rating_deviation as puzzle_deviation,
-                p.moves, 
+                p.moves,
                 group_concat(m.move, ' ') as agent_moves
             FROM game g
             JOIN puzzle p ON g.puzzle_id = p.id

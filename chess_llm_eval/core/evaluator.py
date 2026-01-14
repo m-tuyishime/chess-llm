@@ -33,7 +33,10 @@ class Evaluator:
         )
 
     def update_agent_rating(
-        self, puzzle_ratings: list[int], puzzle_deviations: list[int], puzzle_wins: list[bool]
+        self,
+        puzzle_ratings: list[float] | list[int],
+        puzzle_deviations: list[float] | list[int],
+        puzzle_wins: list[bool],
     ) -> tuple[float, float, float]:
         """Update the agent's rating based on the results of the puzzles."""
         self.logger.debug(f"Updating rating with {len(puzzle_wins)} new results.")

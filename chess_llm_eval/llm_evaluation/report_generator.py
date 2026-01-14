@@ -1,22 +1,25 @@
-import pandas as pd
+from typing import Any
+
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.lines import Line2D  
+import pandas as pd
+from matplotlib.lines import Line2D
 
 from chess_llm_eval.data.sqlite import SQLiteRepository
+
 
 # ---------------------------
 # Module: Création de rapports
 # ---------------------------
 class ReportGenerator:
-    def __init__(self, db_manager: SQLiteRepository = None):
+    def __init__(self, db_manager: SQLiteRepository | None = None) -> None:
         if db_manager is None:
             # Default to default path used by SQLiteRepository
-            self.db_manager = SQLiteRepository()
+            self.db_manager: SQLiteRepository = SQLiteRepository()
         else:
             self.db_manager = db_manager
 
-    def rating_trends(self):
+    def rating_trends(self) -> None:
         """
         Generate a line plot showing the trend of model ratings over evaluations.
         Each model's x-axis is now based on the evaluation index.
@@ -29,7 +32,7 @@ class ReportGenerator:
         plt.figure(figsize=(10, 6))
         for agent_name, data in df.groupby("agent_name"):
             data = data.sort_values("evaluation_index").copy()
-            plt.plot(data['evaluation_index'], data['agent_rating'], label=agent_name)
+            plt.plot(data["evaluation_index"], data["agent_rating"], label=agent_name)
 
         plt.xlabel("Evaluation Index")
         plt.ylabel("Model Rating")
@@ -37,7 +40,7 @@ class ReportGenerator:
         plt.legend()
         plt.show()
 
-    def rating_deviation_trends(self):
+    def rating_deviation_trends(self) -> None:
         """
         Generate a line plot showing the trend of model's rating deviations over evaluations.
         Each model's x-axis is now based on the evaluation index.
@@ -50,7 +53,7 @@ class ReportGenerator:
         plt.figure(figsize=(10, 6))
         for agent_name, data in df.groupby("agent_name"):
             data = data.sort_values("evaluation_index").copy()
-            plt.plot(data['evaluation_index'], data['agent_deviation'], label=agent_name)
+            plt.plot(data["evaluation_index"], data["agent_deviation"], label=agent_name)
 
         plt.xlabel("Evaluation Index")
         plt.ylabel("Model Rating Deviation")
@@ -58,7 +61,7 @@ class ReportGenerator:
         plt.legend()
         plt.show()
 
-    def puzzle_outcome(self):
+    def puzzle_outcome(self) -> None:
         """
         Generate a single bar chart showing successes vs. failures by puzzle type overall.
         (Existing implementation kept for reusability.)
@@ -75,14 +78,14 @@ class ReportGenerator:
         plt.figure(figsize=(10, 6))
         plt.bar(x_pos, df["successes"], width=width, label="Successes")
         plt.bar([p + width for p in x_pos], df["failures"], width=width, label="Failures")
-        plt.xticks([p + width / 2 for p in x_pos], x)
+        plt.xticks([p + width / 2 for p in x_pos], x.tolist())
         plt.xlabel("Puzzle Type")
         plt.ylabel("Count")
         plt.title("Puzzle Outcomes by Type")
         plt.legend()
         plt.show()
 
-    def puzzle_outcomes_by_agent(self):
+    def puzzle_outcomes_by_agent(self) -> None:
         """
         Generate subplots of puzzle outcomes by type for each model.
         For each model, display a bar chart with successes and failures per puzzle type.
@@ -94,45 +97,45 @@ class ReportGenerator:
 
         models = df["agent_name"].unique()
         num_models = len(models)
-        
+
         # Create subplots (arranged in one row or multiple rows if many models)
         cols = min(num_models, 3)  # up to 3 columns
         rows = (num_models + cols - 1) // cols
         fig, axes = plt.subplots(rows, cols, figsize=(cols * 4, rows * 4), squeeze=False)
         axes = axes.flatten()
-        
+
         for idx, model in enumerate(models):
             ax = axes[idx]
             data = df[df["agent_name"] == model]
-            
+
             types = data["type"].tolist()
             successes = data["successes"].tolist()
             failures = data["failures"].tolist()
             x = range(len(types))
             width = 0.35
-            
-            ax.bar(x, successes, width=width, label='Successes')
-            ax.bar([p + width for p in x], failures, width=width, label='Failures')
+
+            ax.bar(x, successes, width=width, label="Successes")
+            ax.bar([p + width for p in x], failures, width=width, label="Failures")
             ax.set_xticks([p + width / 2 for p in x])
             ax.set_xticklabels(types, rotation=45)
-            
+
             ax.set_xlabel("Puzzle Type")
             ax.set_ylabel("Count")
             ax.set_title(model)
             ax.legend()
-        
+
         # Hide any unused subplots
         for jdx in range(idx + 1, len(axes)):
             fig.delaxes(axes[jdx])
-            
+
         plt.tight_layout()
         plt.show()
 
-    def illegal_moves_distribution(self): 
+    def illegal_moves_distribution(self) -> None:
         """
         Generate a bar chart showing the percentage of illegal moves by model.
         The percentage is computed as (illegal_moves_count / total_moves) * 100 for each model.
-        """ 
+        """
         df = self.db_manager.get_illegal_moves_data()
         if df.empty:
             print("No illegal moves data available.")
@@ -140,20 +143,25 @@ class ReportGenerator:
 
         # Calculate illegal moves percentage for all models
         df["illegal_percentage"] = (df["illegal_moves_count"] / df["total_moves"]) * 100
-        
+
         # Sort by percentage for better visualization
         df = df.sort_values("illegal_percentage", ascending=False)
 
         plt.figure(figsize=(10, 6))
         bars = plt.bar(df["agent_name"], df["illegal_percentage"], color="coral")
-        
+
         # Add percentage labels on top of bars
         for bar in bars:
             height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2., height + 0.3,
-                    f'{height:.1f}%',
-                    ha='center', va='bottom', rotation=0)
-            
+            plt.text(
+                bar.get_x() + bar.get_width() / 2.0,
+                height + 0.3,
+                f"{height:.1f}%",
+                ha="center",
+                va="bottom",
+                rotation=0,
+            )
+
         plt.xlabel("Model Name")
         plt.ylabel("Illegal Moves (%)")
         plt.title("Percentage of Illegal Moves by Model")
@@ -163,55 +171,82 @@ class ReportGenerator:
         plt.tight_layout()
         plt.show()
 
-    def final_ratings_intervals(self):
+    def final_ratings_intervals(self) -> None:
         """
         Generate a plot showing each model's final rating with a 95% confidence
-        interval calculated as rating ± (2 × rating_deviation) and the weighted puzzle rating spread.
-        Splits the "Model Final Rating" entry into separate entries for the marker and the error bar.
+        interval calculated as rating +/- (2 x rating_deviation) and the
+        weighted puzzle rating spread.
+        Splits the "Model Final Rating" entry into separate entries for the
+        marker and the error bar.
         """
         df = self.db_manager.get_final_ratings_data()
         if df.empty:
             print("No ratings data available.")
             return
 
-        # Calculate error as 2 × RD
-        df['error'] = df['agent_deviation'] * 2
+        # Calculate error as 2 x RD
+        df["error"] = df["agent_deviation"] * 2
 
         plt.figure(figsize=(8, 6))
         # Remove label from errorbar call
         plt.errorbar(
-            df['agent_name'], 
-            df['agent_rating'], 
-            yerr=df['error'], 
-            fmt='o', 
-            ecolor='red', 
-            capsize=5, 
-            markersize=8
+            df["agent_name"],
+            df["agent_rating"],
+            yerr=df["error"],
+            fmt="o",
+            ecolor="red",
+            capsize=5,
+            markersize=8,
         )
 
-        # Plot weighted puzzle rating spread 
+        # Plot weighted puzzle rating spread
         weighted_rating, weighted_rd = self.db_manager.get_weighted_puzzle_rating()
-        if weighted_rating is not None:
+        if weighted_rating is not None and weighted_rd is not None:
             puzzle_error = weighted_rd * 2
-            plt.axhline(weighted_rating, color='green', linestyle='--')
+            plt.axhline(weighted_rating, color="green", linestyle="--")
             x_min, x_max = plt.xlim()
-            plt.fill_between([x_min, x_max], weighted_rating - puzzle_error, weighted_rating + puzzle_error, 
-                             color='green', alpha=0.2)
+            plt.fill_between(
+                [x_min, x_max],
+                weighted_rating - puzzle_error,
+                weighted_rating + puzzle_error,
+                color="green",
+                alpha=0.2,
+            )
 
         # Create custom proxy handles for legend entries.
         # Proxies for model's final rating (blue dot) and its error bar (red line)
-        marker_proxy = Line2D([], [], marker='o', color='blue', linestyle='None', markersize=8, label='Model Final Rating')
-        spread_proxy = Line2D([], [], color='red', linestyle='-', linewidth=1, label='Model Rating Spread')
-        
+        marker_proxy = Line2D(
+            [],
+            [],
+            marker="o",
+            color="blue",
+            linestyle="None",
+            markersize=8,
+            label="Model Final Rating",
+        )
+        spread_proxy = Line2D(
+            [], [], color="red", linestyle="-", linewidth=1, label="Model Rating Spread"
+        )
+
         handles = [marker_proxy, spread_proxy]
-        
+
         # If weighted puzzle rating exists, create proxies for them as well.
         if weighted_rating is not None:
-            weighted_proxy = Line2D([], [], color='green', linestyle='--', label='Weighted Puzzle Rating')
+            weighted_proxy = Line2D(
+                [], [], color="green", linestyle="--", label="Weighted Puzzle Rating"
+            )
             # For the filled spread, using a thicker line to mimic the filled band.
-            weighted_spread_proxy = Line2D([], [], color='green', linestyle='-', linewidth=10, alpha=0.2, label='Puzzle Rating Spread')
+            weighted_spread_proxy = Line2D(
+                [],
+                [],
+                color="green",
+                linestyle="-",
+                linewidth=10,
+                alpha=0.2,
+                label="Puzzle Rating Spread",
+            )
             handles.extend([weighted_proxy, weighted_spread_proxy])
-        
+
         plt.xlabel("Model Name")
         plt.ylabel("Model Rating")
         plt.title("Final Model Ratings with 95% Confidence Intervals")
@@ -220,7 +255,7 @@ class ReportGenerator:
         plt.legend(handles=handles)
         plt.show()
 
-    def correct_moves_percentage(self):
+    def correct_moves_percentage(self) -> None:
         """
         Generate a bar chart showing the average percentage of correct moves by model.
         The percentage is calculated as:
@@ -235,18 +270,24 @@ class ReportGenerator:
         for idx, row in df.iterrows():
             expected = row["moves"]
             # Split moves into lists (ignoring extra whitespace)
-            expected_moves = expected.strip().split() if isinstance(expected, str) and expected.strip() else []
+            expected_moves = (
+                expected.strip().split() if isinstance(expected, str) and expected.strip() else []
+            )
             num_expected = len(expected_moves)
             if num_expected == 0:
                 raise ValueError(f"Expected moves for puzzle {idx} are empty or invalid.")
 
             agent_solution = row["agent_moves"]
-            agent_moves = agent_solution.strip().split() if isinstance(agent_solution, str) and agent_solution.strip() else []
+            agent_moves = (
+                agent_solution.strip().split()
+                if isinstance(agent_solution, str) and agent_solution.strip()
+                else []
+            )
             # Calculate percentage of moves provided
             if len(agent_moves) > num_expected:
                 # Log warning instead of raising? Or just clamp?
                 # Using original logic for now: raise
-                # But actually, in LLM generation, it might hallucinate extra moves. 
+                # But actually, in LLM generation, it might hallucinate extra moves.
                 # Let's keep original logic to match legacy behavior unless we want to fix it.
                 # Given this is a port, exact match is safest.
                 raise ValueError(f"Model moves for puzzle {idx} exceed expected moves.")
@@ -270,8 +311,8 @@ class ReportGenerator:
         plt.ylim(0, 100)
         plt.grid(axis="y")
         plt.show()
-        
-    def token_usage_per_move(self):
+
+    def token_usage_per_move(self) -> None:
         """
         Generate subplots showing average token usage per move for each model.
         One subplot for prompt tokens and another for completion tokens.
@@ -282,44 +323,36 @@ class ReportGenerator:
             print("No token usage data available per move.")
             return
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-        
+        _fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
         # Sort by token usage for better visualization
-        df_prompt = df.sort_values('avg_prompt_tokens', ascending=False)
-        df_completion = df.sort_values('avg_completion_tokens', ascending=False)
-        
+        df_prompt = df.sort_values("avg_prompt_tokens", ascending=False)
+        df_completion = df.sort_values("avg_completion_tokens", ascending=False)
+
         # Plot prompt tokens with log y-axis
-        ax1.bar(df_prompt['agent_name'], df_prompt['avg_prompt_tokens'], color='blue')
-        ax1.set_title('Average Prompt Tokens per Move (Log Scale)')
-        ax1.set_xlabel('Model')
-        ax1.set_ylabel('Tokens')
-        ax1.set_xticks(df_prompt['agent_name'])
-        ax1.set_xticklabels(
-            ax1.get_xticklabels(),
-            rotation=45,         
-            ha="right"         
-        )
-        ax1.grid(axis='y', linestyle='--', alpha=0.7)
-        ax1.set_yscale('log')
-        
+        ax1.bar(df_prompt["agent_name"], df_prompt["avg_prompt_tokens"], color="blue")
+        ax1.set_title("Average Prompt Tokens per Move (Log Scale)")
+        ax1.set_xlabel("Model")
+        ax1.set_ylabel("Tokens")
+        ax1.set_xticks(df_prompt["agent_name"])
+        ax1.set_xticklabels(ax1.get_xticklabels(), rotation=45, ha="right")
+        ax1.grid(axis="y", linestyle="--", alpha=0.7)
+        ax1.set_yscale("log")
+
         # Plot completion tokens with log y-axis
-        ax2.bar(df_completion['agent_name'], df_completion['avg_completion_tokens'], color='green')
-        ax2.set_title('Average Completion Tokens per Move (Log Scale)')
-        ax2.set_xlabel('Model')
-        ax2.set_ylabel('Tokens')
-        ax2.set_xticks(df_completion['agent_name'])
-        ax2.set_xticklabels(
-            ax2.get_xticklabels(),
-            rotation=45,         
-            ha="right"         
-        )
-        ax2.grid(axis='y', linestyle='--', alpha=0.7)
-        ax2.set_yscale('log')
-        
+        ax2.bar(df_completion["agent_name"], df_completion["avg_completion_tokens"], color="green")
+        ax2.set_title("Average Completion Tokens per Move (Log Scale)")
+        ax2.set_xlabel("Model")
+        ax2.set_ylabel("Tokens")
+        ax2.set_xticks(df_completion["agent_name"])
+        ax2.set_xticklabels(ax2.get_xticklabels(), rotation=45, ha="right")
+        ax2.grid(axis="y", linestyle="--", alpha=0.7)
+        ax2.set_yscale("log")
+
         plt.tight_layout()
         plt.show()
 
-    def token_usage_per_puzzle(self):
+    def token_usage_per_puzzle(self) -> None:
         """
         Generate subplots showing average token usage per puzzle for each model.
         One subplot for prompt tokens and another for completion tokens.
@@ -330,46 +363,42 @@ class ReportGenerator:
             print("No token usage data available per puzzle.")
             return
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-        
+        _fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
         # Sort by token usage for better visualization
-        df_prompt = df.sort_values('avg_puzzle_prompt_tokens', ascending=False)
-        df_completion = df.sort_values('avg_puzzle_completion_tokens', ascending=False)
-        
+        df_prompt = df.sort_values("avg_puzzle_prompt_tokens", ascending=False)
+        df_completion = df.sort_values("avg_puzzle_completion_tokens", ascending=False)
+
         # Plot prompt tokens with log y-axis
-        ax1.bar(df_prompt['agent_name'], df_prompt['avg_puzzle_prompt_tokens'], color='purple')
-        ax1.set_title('Average Prompt Tokens per Puzzle (Log Scale)')
-        ax1.set_xlabel('Model')
-        ax1.set_ylabel('Tokens')
-        ax1.set_xticks(df_prompt['agent_name'])
-        ax1.set_xticklabels(
-            ax1.get_xticklabels(),
-            rotation=45,         
-            ha="right"         
-        )
-        ax1.grid(axis='y', linestyle='--', alpha=0.7)
-        ax1.set_yscale('log')
-        
+        ax1.bar(df_prompt["agent_name"], df_prompt["avg_puzzle_prompt_tokens"], color="purple")
+        ax1.set_title("Average Prompt Tokens per Puzzle (Log Scale)")
+        ax1.set_xlabel("Model")
+        ax1.set_ylabel("Tokens")
+        ax1.set_xticks(df_prompt["agent_name"])
+        ax1.set_xticklabels(ax1.get_xticklabels(), rotation=45, ha="right")
+        ax1.grid(axis="y", linestyle="--", alpha=0.7)
+        ax1.set_yscale("log")
+
         # Plot completion tokens with log y-axis
-        ax2.bar(df_completion['agent_name'], df_completion['avg_puzzle_completion_tokens'], color='orange')
-        ax2.set_title('Average Completion Tokens per Puzzle (Log Scale)')
-        ax2.set_xlabel('Model')
-        ax2.set_ylabel('Tokens')
-        ax2.set_xticks(df_completion['agent_name'])
-        ax2.set_xticklabels(
-            ax2.get_xticklabels(),
-            rotation=45,         
-            ha="right"         
+        ax2.bar(
+            df_completion["agent_name"],
+            df_completion["avg_puzzle_completion_tokens"],
+            color="orange",
         )
-        ax2.grid(axis='y', linestyle='--', alpha=0.7)
-        ax2.set_yscale('log')
-        
+        ax2.set_title("Average Completion Tokens per Puzzle (Log Scale)")
+        ax2.set_xlabel("Model")
+        ax2.set_ylabel("Tokens")
+        ax2.set_xticks(df_completion["agent_name"])
+        ax2.set_xticklabels(ax2.get_xticklabels(), rotation=45, ha="right")
+        ax2.grid(axis="y", linestyle="--", alpha=0.7)
+        ax2.set_yscale("log")
+
         plt.tight_layout()
         plt.show()
 
-    def success_percentage_by_theme_rating_bins(self, num_bins: int = 5):
+    def success_percentage_by_theme_rating_bins(self, num_bins: int = 5) -> None:
         """
-        Generate subplots (one per puzzle type) showing the percentage of successful puzzles 
+        Generate subplots (one per puzzle type) showing the percentage of successful puzzles
         by model within puzzle rating bins. For each bin, the displayed value is:
             (success_count / (success_count + failure_count)) * 100.
         Bins are generated using quantile-based binning.
@@ -380,29 +409,30 @@ class ReportGenerator:
             return
 
         # Determine success: a puzzle is successful if agent_moves count ≥ expected moves count.
-        def is_success(row):
+        def is_success(row: Any) -> bool:
             if pd.isna(row["moves"]) or pd.isna(row["agent_moves"]):
                 return False
             expected = row["moves"].strip().split()
             agent_solution = row["agent_moves"].strip().split()
             return len(agent_solution) >= len(expected)
-        
+
         df["success"] = df.apply(is_success, axis=1)
 
         # Define bins using quantiles from the puzzle ratings.
         ratings = df["puzzle_rating"]
         bin_edges = np.quantile(ratings, np.linspace(0, 1, num_bins + 1))
-        # Ensure bin edges are unique and sorted if data is sparse? 
+        # Ensure bin edges are unique and sorted if data is sparse?
         # But this is copy-paste code, so assume it works.
         bin_edges = np.round(bin_edges).astype(int)
         bins_info = []
         for i in range(num_bins):
             low = bin_edges[i]
-            high = bin_edges[i+1]
-            label = f"{low}-{high-1}"
+            high = bin_edges[i + 1]
+            label = f"{low}-{high - 1}"
             bins_info.append((low, high, label))
-        
-        # For every puzzle (success or failure), create a record for each bin where its rating ± deviation overlaps.
+
+        # For every puzzle (success or failure), create a record for each bin where
+        # its rating ± deviation overlaps.
         records = []
         for _, row in df.iterrows():
             r = row["puzzle_rating"]
@@ -412,20 +442,27 @@ class ReportGenerator:
             outcome = "success" if row["success"] else "failure"
             for bin_low, bin_high, label in bins_info:
                 if rmin <= bin_high and rmax >= bin_low:
-                    records.append({
-                        "type": row["type"],
-                        "agent_name": row["agent_name"],
-                        "bin_label": label,
-                        "outcome": outcome
-                    })
-        
+                    records.append(
+                        {
+                            "type": row["type"],
+                            "agent_name": row["agent_name"],
+                            "bin_label": label,
+                            "outcome": outcome,
+                        }
+                    )
+
         if not records:
             print("No bin overlaps were found for puzzles.")
             return
 
         agg_df = pd.DataFrame(records)
         # Group by type, bin, model, and outcome.
-        grouped = agg_df.groupby(["type", "bin_label", "agent_name", "outcome"]).size().unstack(fill_value=0).reset_index()
+        grouped = (
+            agg_df.groupby(["type", "bin_label", "agent_name", "outcome"])
+            .size()
+            .unstack(fill_value=0)
+            .reset_index()
+        )
         # Compute success percentage.
         # Sometimes a bin may have only successes or only failures.
         grouped["total"] = grouped.get("success", 0) + grouped.get("failure", 0)
@@ -438,7 +475,7 @@ class ReportGenerator:
 
         types = grouped["type"].unique()
         num_types = len(types)
-        fig, axes = plt.subplots(1, num_types, figsize=(6 * num_types, 5), squeeze=False)
+        _fig, axes = plt.subplots(1, num_types, figsize=(6 * num_types, 5), squeeze=False)
         axes = axes.flatten()
 
         # Determine bin order based on the numeric lower bound.
@@ -448,7 +485,9 @@ class ReportGenerator:
         for idx, t in enumerate(types):
             ax = axes[idx]
             type_data = grouped[grouped["type"] == t]
-            pivot = type_data.pivot(index="bin_label", columns="agent_name", values="success_pct").reindex(bin_order)
+            pivot = type_data.pivot(
+                index="bin_label", columns="agent_name", values="success_pct"
+            ).reindex(bin_order)
             x = np.arange(len(pivot.index))
             total_width = 0.8
             num_models = len(all_models)
@@ -456,10 +495,21 @@ class ReportGenerator:
 
             for j, model in enumerate(all_models):
                 # Get success percentage for this model; if missing, assume 0.
-                percentages = [pivot.at[bin_label, model] if bin_label in pivot.index and model in pivot.columns else 0 for bin_label in bin_order]
-                positions = x - total_width/2 + j * bar_width + bar_width/2
-                ax.bar(positions, percentages, width=bar_width, label=model if idx == 0 else "", color=agent_colors.get(model))
-            
+                percentages = [
+                    pivot.at[bin_label, model]
+                    if bin_label in pivot.index and model in pivot.columns
+                    else 0
+                    for bin_label in bin_order
+                ]
+                positions = x - total_width / 2 + j * bar_width + bar_width / 2
+                ax.bar(
+                    positions,
+                    percentages,
+                    width=bar_width,
+                    label=model if idx == 0 else "",
+                    color=agent_colors.get(model),
+                )
+
             ax.set_xticks(x)
             ax.set_xticklabels(bin_order, rotation=0)
             ax.set_xlabel("Puzzle Rating Bins")
