@@ -44,7 +44,8 @@ ruff_errors.txt
 docs/*.pdf
 
 # Node / Website
-website/client/node_modules/
-website/client/dist/
-website/client/.env
+website/
+node_modules/
+dist/
+.env.local
 .eslintcache
