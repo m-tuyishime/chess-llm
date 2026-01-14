@@ -45,9 +45,9 @@
 
 ### 1.5 Testing
 
-- [ ] Port existing tests to pytest
-- [ ] Add unit tests for protocols with mock implementations
-- [ ] Verify `pip install -e .` works locally
+- [x] Port existing tests to pytest
+- [x] Add unit tests for protocols with mock implementations
+- [x] Verify `pip install -e .` works locally
 
 ### 1.6 Pipeline Validation Run
 
