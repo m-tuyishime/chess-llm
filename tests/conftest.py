@@ -1,7 +1,14 @@
+import os
+from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
+# Load .env file for integration tests
+from dotenv import load_dotenv
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(env_path)
 
 from chess_llm_eval.agents.base import Agent
 from chess_llm_eval.data.models import AgentData, AgentRanking, Game, MoveRecord, Puzzle

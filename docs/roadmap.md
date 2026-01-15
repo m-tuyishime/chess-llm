@@ -51,9 +51,9 @@
 
 ### 1.6 Pipeline Validation Run
 
-- [ ] Run 3 models (via NVIDIA NIM/OpenRouter) on 3 chess puzzles each
-- [ ] Verify end-to-end pipeline: Agent → Evaluator → SQLiteRepository
-- [ ] Store results to verify compatibility with future website backend
+- [x] Run 3 models (via NVIDIA NIM/OpenRouter) on 3 chess puzzles each
+- [x] Verify end-to-end pipeline: Agent → Evaluator → SQLiteRepository
+- [x] Store results to verify compatibility with future website backend
 - [ ] Compare performance/reasoning against research paper baseline
 
 **Week 1 Deliverable**: Installable library with clean interfaces, full type coverage, and validated pipeline run.

@@ -24,6 +24,7 @@ dev = [
     "ruff",
     "mypy",
     "pandas-stubs",
+    "python-dotenv",
 ]
 
 [tool.setuptools.packages.find]
@@ -75,3 +76,10 @@ module = [
     "matplotlib.*"
 ]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests (requiring external API keys)",
+]
+asyncio_mode = "auto"
+
