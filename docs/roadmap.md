@@ -54,7 +54,6 @@
 - [x] Run 3 models (via NVIDIA NIM/OpenRouter) on 3 chess puzzles each
 - [x] Verify end-to-end pipeline: Agent → Evaluator → SQLiteRepository
 - [x] Store results to verify compatibility with future website backend
-- [ ] Compare performance/reasoning against research paper baseline
 
 **Week 1 Deliverable**: Installable library with clean interfaces, full type coverage, and validated pipeline run.
 
@@ -66,10 +65,10 @@
 
 ### 2.1 Server Setup
 
-- [ ] Create `website/server/` structure
-- [ ] Set up FastAPI app with CORS for portfolio subdomain
-- [ ] Configure Pydantic v2 for request/response schemas
-- [ ] Add ESLint-equivalent linting (ruff for Python)
+- [x] Create `website/server` directory structure
+- [x] Set up FastAPI app with CORS for portfolio subdomain
+- [x] Configure Pydantic v2 for request/response schemas
+- [x] Add ESLint-equivalent linting (ruff for Python)
 
 ### 2.2 API Endpoints
 

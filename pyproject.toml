@@ -15,6 +15,9 @@ dependencies = [
     "glicko2",
     "openai",
     "aiolimiter",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
 ]
 
 [project.optional-dependencies]
@@ -29,7 +32,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["chess_llm_eval*"]
+include = ["chess_llm_eval*", "website*"]
 
 [tool.ruff]
 line-length = 100
@@ -73,7 +76,11 @@ module = [
     "chess.*",
     "glicko2.*",
     "pandas.*",
-    "matplotlib.*"
+    "matplotlib.*",
+    "fastapi",
+    "fastapi.*",
+    "uvicorn",
+    "uvicorn.*",
 ]
 ignore_missing_imports = true
 

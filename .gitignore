@@ -44,7 +44,6 @@ ruff_errors.txt
 docs/*.pdf
 
 # Node / Website
-website/
 node_modules/
 dist/
 .env.local
