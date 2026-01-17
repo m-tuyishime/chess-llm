@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -7,13 +6,20 @@ import pytest
 
 # Load .env file for integration tests
 from dotenv import load_dotenv
+
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(env_path)
 
-from chess_llm_eval.agents.base import Agent
-from chess_llm_eval.data.models import AgentData, AgentRanking, Game, MoveRecord, Puzzle
-from chess_llm_eval.data.protocols import GameRepository
-from chess_llm_eval.providers.base import LLMProvider
+from chess_llm_eval.agents.base import Agent  # noqa: E402
+from chess_llm_eval.data.models import (  # noqa: E402
+    AgentData,
+    AgentRanking,
+    Game,
+    MoveRecord,
+    Puzzle,
+)
+from chess_llm_eval.data.protocols import GameRepository  # noqa: E402
+from chess_llm_eval.providers.base import LLMProvider  # noqa: E402
 
 
 def pytest_runtest_setup(item: pytest.Item) -> None:
@@ -87,6 +93,12 @@ class MockRepository(GameRepository):
 
     def get_agent_games(self, agent_name: str) -> list[Game]:
         return []
+
+    def get_game(self, game_id: int) -> Game | None:
+        return None
+
+    def get_puzzle(self, puzzle_id: str) -> Puzzle | None:
+        return None
 
 
 @pytest.fixture

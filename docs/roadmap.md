@@ -72,29 +72,29 @@
 
 ### 2.2 API Endpoints
 
-- [ ] `GET /api/leaderboard` → List agents by rating
-- [ ] `GET /api/agents/{name}` → Agent details + game list
-- [ ] `GET /api/games/{id}` → Full replay with moves
-- [ ] `GET /api/puzzles/{id}` → Puzzle metadata
+- [x] `GET /api/leaderboard` → List agents by rating
+- [x] `GET /api/agents/{name}` → Agent details + game list
+- [x] `GET /api/games/{id}` → Full replay with moves
+- [x] `GET /api/puzzles/{id}` → Puzzle metadata
 
 ### 2.3 Dependency Injection
 
-- [ ] Create `dependencies.py` with:
+- [x] Create `dependencies.py` with:
   - `get_repository()` → Returns `SQLiteRepository`
   - Easy swap to PostgreSQL later
-- [ ] Wire repositories into route handlers
+- [x] Wire repositories into route handlers
 
 ### 2.4 Data Validation
 
-- [ ] Define Pydantic schemas in `schemas.py`
-- [ ] Validate all responses match expected structure
-- [ ] Add error handling middleware
+- [x] Define Pydantic schemas in `schemas.py`
+- [x] Validate all responses match expected structure
+- [x] Add error handling middleware
 
 ### 2.5 Testing
 
-- [ ] Integration tests with TestClient
-- [ ] Verify all endpoints return correct data
-- [ ] Test error cases (404, invalid params)
+- [x] Integration tests with TestClient
+- [x] Verify all endpoints return correct data
+- [x] Test error cases (404, invalid params)
 
 **Week 2 Deliverable**: Fully functional API serving real data from SQLite
 
