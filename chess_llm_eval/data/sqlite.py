@@ -1,6 +1,7 @@
 import contextlib
 import logging
 import sqlite3
+from datetime import datetime
 
 import pandas as pd
 
@@ -122,6 +123,13 @@ class SQLiteRepository:
             query += f" LIMIT {limit}"
         cursor = self.conn.execute(query)
         return [self._map_puzzle(row) for row in cursor.fetchall()]
+
+    def get_puzzle(self, puzzle_id: str) -> Puzzle | None:
+        cursor = self.conn.execute("SELECT * FROM puzzle WHERE id = ?", (puzzle_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return self._map_puzzle(row)
 
     def get_uncompleted_puzzles(self, agent_name: str, limit: int | None = None) -> list[Puzzle]:
         query = """
@@ -350,9 +358,65 @@ class SQLiteRepository:
         rankings.sort(key=lambda x: x.rating, reverse=True)
         return rankings
 
+    def get_game(self, game_id: int) -> Game | None:
+        cursor = self.conn.execute("SELECT * FROM game WHERE id = ?", (game_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None
+
+        # Get moves
+        move_cursor = self.conn.execute(
+            "SELECT * FROM move WHERE game_id = ? ORDER BY id", (game_id,)
+        )
+        moves = [self._map_move(m) for m in move_cursor.fetchall()]
+
+        return Game(
+            id=row["id"],
+            puzzle_id=row["puzzle_id"],
+            agent_name=row["agent_name"],
+            failed=bool(row["failed"]),
+            date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
+            moves=moves,
+        )
+
     def get_agent_games(self, agent_name: str) -> list[Game]:
-        # TODO: Implement full game loading
-        return []
+        cursor = self.conn.execute(
+            "SELECT * FROM game WHERE agent_name = ? ORDER BY date DESC", (agent_name,)
+        )
+        games = []
+        for row in cursor.fetchall():
+            # Get moves for each game
+            # Note: N+1 query problem here, but likely acceptable for MVP scale
+            # or we can optimize with a join later if needed.
+            game_id = row["id"]
+            move_cursor = self.conn.execute(
+                "SELECT * FROM move WHERE game_id = ? ORDER BY id", (game_id,)
+            )
+            moves = [self._map_move(m) for m in move_cursor.fetchall()]
+
+            games.append(
+                Game(
+                    id=game_id,
+                    puzzle_id=row["puzzle_id"],
+                    agent_name=row["agent_name"],
+                    failed=bool(row["failed"]),
+                    date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
+                    moves=moves,
+                )
+            )
+        return games
+
+    def _map_move(self, row: sqlite3.Row) -> MoveRecord:
+        return MoveRecord(
+            id=row["id"],
+            game_id=row["game_id"],
+            fen=row["fen"],
+            expected_move=row["correct_move"],
+            actual_move=row["move"],
+            is_illegal=bool(row["illegal_move"]),
+            prompt_tokens=row["prompt_tokens"] or 0,
+            completion_tokens=row["completion_tokens"] or 0,
+        )
 
     # --- Reporting / Analysis Methods (returning Pandas DataFrames) ---
 
