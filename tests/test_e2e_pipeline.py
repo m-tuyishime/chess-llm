@@ -125,9 +125,7 @@ async def test_single_puzzle_evaluation(
     )
 
     # Save agent to repository
-    repository.save_agent(
-        AgentData(name=agent.name, is_reasoning=False, is_random=False)
-    )
+    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
     evaluator = Evaluator(agent, [SAMPLE_PUZZLES[0]], repository)
     result = await evaluator.evaluate_puzzle(SAMPLE_PUZZLES[0])
@@ -163,9 +161,7 @@ async def test_multi_puzzle_evaluation(
         is_reasoning=False,
     )
 
-    repository.save_agent(
-        AgentData(name=agent.name, is_reasoning=False, is_random=False)
-    )
+    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
     evaluator = Evaluator(agent, SAMPLE_PUZZLES, repository)
     await evaluator.evaluate_all(max_concurrent=2)
@@ -178,18 +174,14 @@ async def test_multi_puzzle_evaluation(
     assert count == 3
 
     # Verify all puzzles have results
-    cursor = repository.conn.execute(
-        "SELECT * FROM game WHERE agent_name = ?", (agent.name,)
-    )
+    cursor = repository.conn.execute("SELECT * FROM game WHERE agent_name = ?", (agent.name,))
     games = cursor.fetchall()
     assert len(games) == 3
 
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-async def test_rating_update_flow(
-    repository: SQLiteRepository, nim_provider: NIMProvider
-) -> None:
+async def test_rating_update_flow(repository: SQLiteRepository, nim_provider: NIMProvider) -> None:
     """
     Test Glicko-2 rating updates after puzzle completion.
     Why: Verifies that benchmark records are created and agent rating
@@ -201,9 +193,7 @@ async def test_rating_update_flow(
         is_reasoning=False,
     )
 
-    repository.save_agent(
-        AgentData(name=agent.name, is_reasoning=False, is_random=False)
-    )
+    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
     evaluator = Evaluator(agent, [SAMPLE_PUZZLES[0]], repository)
     result = await evaluator.evaluate_puzzle(SAMPLE_PUZZLES[0])
@@ -212,9 +202,7 @@ async def test_rating_update_flow(
     game_id, _ = result
 
     # Verify benchmark was created
-    cursor = repository.conn.execute(
-        "SELECT * FROM benchmark WHERE game_id = ?", (game_id,)
-    )
+    cursor = repository.conn.execute("SELECT * FROM benchmark WHERE game_id = ?", (game_id,))
     benchmark = cursor.fetchone()
     assert benchmark is not None
     assert benchmark["agent_rating"] is not None
@@ -243,9 +231,7 @@ async def test_illegal_move_handling_e2e(
         is_reasoning=False,
     )
 
-    repository.save_agent(
-        AgentData(name=agent.name, is_reasoning=False, is_random=False)
-    )
+    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
     evaluator = Evaluator(agent, [SAMPLE_PUZZLES[0]], repository)
     result = await evaluator.evaluate_puzzle(SAMPLE_PUZZLES[0])
@@ -257,10 +243,12 @@ async def test_illegal_move_handling_e2e(
     cursor = repository.conn.execute(
         "SELECT * FROM move WHERE game_id = ? AND illegal_move = 1", (game_id,)
     )
-    illegal_moves = cursor.fetchall()
+    cursor.fetchall()
 
     # Whether illegal moves occurred or not, verify all moves were logged
-    cursor = repository.conn.execute("SELECT COUNT(*) as count FROM move WHERE game_id = ?", (game_id,))
+    cursor = repository.conn.execute(
+        "SELECT COUNT(*) as count FROM move WHERE game_id = ?", (game_id,)
+    )
     move_count = cursor.fetchone()["count"]
     assert move_count > 0
 
@@ -290,9 +278,7 @@ async def test_three_agents_three_puzzles(
             is_reasoning=False,
         )
 
-        repository.save_agent(
-            AgentData(name=agent.name, is_reasoning=False, is_random=False)
-        )
+        repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
         evaluator = Evaluator(agent, SAMPLE_PUZZLES, repository)
         await evaluator.evaluate_all(max_concurrent=2)

@@ -72,6 +72,4 @@ async def test_openrouter_complete_empty_response(
     mock_openai_client.chat.completions.create.return_value = mock_completion
 
     with pytest.raises(ValueError, match="Empty response"):
-        await openrouter_provider.complete(
-            [{"role": "user", "content": "hi"}], model="test-model"
-        )
+        await openrouter_provider.complete([{"role": "user", "content": "hi"}], model="test-model")

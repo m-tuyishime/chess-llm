@@ -55,9 +55,7 @@ async def test_evaluator_evaluate_puzzle_illegal_move_retry(
     assert len(mock_repo.moves[1]) == 3  # 1 opponent + 1 illegal model + 1 legal model
 
 
-def test_evaluator_update_agent_rating(
-    mock_agent: MagicMock, mock_repo: MockRepository
-) -> None:
+def test_evaluator_update_agent_rating(mock_agent: MagicMock, mock_repo: MockRepository) -> None:
     """
     Test the Glicko-2 rating update logic.
     Why: The leaderboard is driven by these ratings. We need to verify that we are
