@@ -1,0 +1,9 @@
+{
+  "**/*.py": [
+    "uv run ruff check --fix",
+    "uv run mypy"
+  ],
+  "website/client/**/*.{ts,tsx}": [
+    "npm run lint --prefix website/client -- --fix"
+  ]
+}

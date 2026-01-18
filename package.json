@@ -1,0 +1,31 @@
+{
+  "name": "chess-llm",
+  "version": "1.0.0",
+  "description": "This project presents a comparative analysis of the performance of various Large Language Models (LLMs) in solving chess puzzles. An automated evaluation system was developed using Python to benchmark different LLMs against a diverse set of chess puzzles sourced from the Lichess database, categorized by themes like \"End Game\", \"Strategic\", and \"Tactic\". The system employs the Glicko-2 rating system to estimate and compare the playing strength of the models in a manner comparable to human chess ratings.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-tuyishime/chess-llm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/m-tuyishime/chess-llm/issues"
+  },
+  "homepage": "https://github.com/m-tuyishime/chess-llm#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  }
+}
