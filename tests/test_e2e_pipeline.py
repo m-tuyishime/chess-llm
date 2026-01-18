@@ -288,7 +288,7 @@ async def test_three_agents_three_puzzles(
     # Verify all 3 agents completed
     assert len(results) == 3
 
-    # Verify total games created: 3 agents × 3 puzzles = 9 games
+    # Verify total games created: 3 agents x 3 puzzles = 9 games
     cursor = repository.conn.execute("SELECT COUNT(*) as count FROM game")
     total_games = cursor.fetchone()["count"]
     assert total_games == 9
