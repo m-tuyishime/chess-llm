@@ -378,7 +378,7 @@ class SQLiteRepository:
         return Game(
             id=row["id"],
             puzzle_id=row["puzzle_id"],
-            puzzle_type=row["puzzle_type"] if "puzzle_type" in row.keys() else "",
+            puzzle_type=row.get("puzzle_type", ""),
             agent_name=row["agent_name"],
             failed=bool(row["failed"]),
             date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
@@ -408,7 +408,7 @@ class SQLiteRepository:
                 Game(
                     id=game_id,
                     puzzle_id=row["puzzle_id"],
-                    puzzle_type=row["puzzle_type"] if "puzzle_type" in row.keys() else "",
+                    puzzle_type=row.get("puzzle_type", ""),
                     agent_name=row["agent_name"],
                     failed=bool(row["failed"]),
                     date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
