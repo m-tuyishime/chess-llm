@@ -126,10 +126,10 @@
 
 ### 3.4 Agent Detail Page (`/agent/:name`)
 
-- [ ] Display agent summary (rating, games played, win rate)
-- [ ] List all puzzles attempted with outcomes
-- [ ] Filter by puzzle type and outcome
-- [ ] Paginate results
+- [x] Display agent summary (rating, games played, win rate)
+- [x] List all puzzles attempted with outcomes
+- [x] Filter by puzzle type and outcome
+- [x] Paginate results
 
 ### 3.5 Puzzle Replay Page (`/replay/:gameId`)
 
@@ -165,7 +165,7 @@
 - [ ] Consistent design system (colors, typography, spacing)
 - [ ] Dark/light mode toggle
 - [ ] Smooth page transitions
-- [ ] Loading skeletons
+- [x] Loading skeletons
 - [ ] 404 and error pages
 
 ### 4.3 Accessibility & SEO

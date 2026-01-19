@@ -30,6 +30,7 @@ export interface MoveRecordResponse {
 export interface GameResponse {
   id: number | null;
   puzzle_id: string;
+  puzzle_type: string;
   agent_name: string;
   failed: boolean;
   moves: MoveRecordResponse[];

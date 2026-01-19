@@ -47,6 +47,7 @@ class Game:
     moves: list[MoveRecord] = field(default_factory=list)
     id: int | None = None
     date: datetime = field(default_factory=datetime.now)
+    puzzle_type: str = ""
 
 
 @dataclass

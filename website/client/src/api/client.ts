@@ -45,7 +45,8 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 export const api = {
   getHealth: () => request<HealthResponse>('/health'),
   getLeaderboard: () => request<AgentRankingResponse[]>('/api/leaderboard'),
-  getAgentDetail: (name: string) => request<AgentDetailResponse>(`/api/agents/${name}`),
+  getAgentDetail: (name: string) =>
+    request<AgentDetailResponse>(`/api/agents/${encodeURIComponent(name)}`),
   getGame: (id: string) => request<GameResponse>(`/api/games/${id}`),
   getPuzzle: (id: string) => request<PuzzleResponse>(`/api/puzzles/${id}`),
 };

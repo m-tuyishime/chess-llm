@@ -4,6 +4,6 @@
     "uv run mypy"
   ],
   "website/client/**/*.{ts,tsx}": [
-    "npm run lint --prefix website/client -- --fix"
+    "npm run lint:file --prefix website/client -- --fix"
   ]
 }

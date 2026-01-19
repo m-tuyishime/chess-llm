@@ -359,7 +359,12 @@ class SQLiteRepository:
         return rankings
 
     def get_game(self, game_id: int) -> Game | None:
-        cursor = self.conn.execute("SELECT * FROM game WHERE id = ?", (game_id,))
+        cursor = self.conn.execute("""
+            SELECT g.*, p.type as puzzle_type
+            FROM game g
+            JOIN puzzle p ON g.puzzle_id = p.id
+            WHERE g.id = ?
+        """, (game_id,))
         row = cursor.fetchone()
         if not row:
             return None
@@ -373,6 +378,7 @@ class SQLiteRepository:
         return Game(
             id=row["id"],
             puzzle_id=row["puzzle_id"],
+            puzzle_type=row["puzzle_type"] if "puzzle_type" in row.keys() else "",
             agent_name=row["agent_name"],
             failed=bool(row["failed"]),
             date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
@@ -380,9 +386,13 @@ class SQLiteRepository:
         )
 
     def get_agent_games(self, agent_name: str) -> list[Game]:
-        cursor = self.conn.execute(
-            "SELECT * FROM game WHERE agent_name = ? ORDER BY date DESC", (agent_name,)
-        )
+        cursor = self.conn.execute("""
+            SELECT g.*, p.type as puzzle_type
+            FROM game g
+            JOIN puzzle p ON g.puzzle_id = p.id
+            WHERE g.agent_name = ?
+            ORDER BY g.date DESC
+        """, (agent_name,))
         games = []
         for row in cursor.fetchall():
             # Get moves for each game
@@ -398,6 +408,7 @@ class SQLiteRepository:
                 Game(
                     id=game_id,
                     puzzle_id=row["puzzle_id"],
+                    puzzle_type=row["puzzle_type"] if "puzzle_type" in row.keys() else "",
                     agent_name=row["agent_name"],
                     failed=bool(row["failed"]),
                     date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
