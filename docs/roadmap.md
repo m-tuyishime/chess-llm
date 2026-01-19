@@ -106,23 +106,23 @@
 
 ### 3.1 Project Setup
 
-- [ ] Create `website/client/` with Vite + TypeScript
-- [ ] Configure ESLint + Prettier with strict rules
-- [ ] Set up `tsconfig.json` with `strict: true`
-- [ ] Add client-side router
+- [x] Create `website/client/` with Vite + TypeScript
+- [x] Configure ESLint + Prettier with strict rules
+- [x] Set up `tsconfig.json` with `strict: true`
+- [x] Add client-side router
 
 ### 3.2 API Integration
 
-- [ ] Create typed API client in `api/client.ts`
-- [ ] Define TypeScript interfaces matching backend schemas
-- [ ] Add loading/error states for all queries
+- [x] Create typed API client in `api/client.ts`
+- [x] Define TypeScript interfaces matching backend schemas
+- [x] Add loading/error states for all queries
 
 ### 3.3 Leaderboard Page (`/`)
 
-- [ ] Fetch and render agent rankings
-- [ ] Display: Rank, Model, Rating ±RD, Win Rate
-- [ ] Make rows clickable → navigate to agent detail
-- [ ] Responsive table design
+- [x] Fetch and render agent rankings
+- [x] Display: Rank, Model, Rating ±RD, Win Rate
+- [x] Make rows clickable → navigate to agent detail
+- [x] Responsive table design
 
 ### 3.4 Agent Detail Page (`/agent/:name`)
 
