@@ -146,6 +146,16 @@
 - [ ] Link to full paper PDF
 - [ ] Author credits
 
+### 3.7 Analytics & Comparison (New)
+
+- [ ] Interactive charts for model rating trends (Line Chart)
+- [ ] Model performance comparison tool (win rates, puzzle type analysis)
+- [ ] Visualizations based on reports:
+  - Model Rating Trends
+  - Rating Deviation Trends
+  - Percentage of Illegal Moves
+  - Puzzle Outcomes by Type
+
 **Week 3 Deliverable**: Complete SPA with all 4 pages functional
 
 ---
