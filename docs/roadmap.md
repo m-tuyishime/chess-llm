@@ -119,10 +119,10 @@
 
 ### 3.3 Leaderboard Page (`/`)
 
-- [ ] Fetch and render agent rankings
-- [ ] Display: Rank, Model, Rating ±RD, Win Rate
-- [ ] Make rows clickable → navigate to agent detail
-- [ ] Responsive table design
+- [x] Fetch and render agent rankings
+- [x] Display: Rank, Model, Rating ±RD, Win Rate
+- [x] Make rows clickable → navigate to agent detail
+- [x] Responsive table design
 
 ### 3.4 Agent Detail Page (`/agent/:name`)
 
