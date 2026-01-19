@@ -19,6 +19,7 @@ app = FastAPI(title="Chess-LLM Arena API")
 # TODO: Move to config
 origins = [
     "http://localhost:5173",  # Vite default
+    "http://localhost:5174",
     "http://localhost:3000",
     # Add production domain later
 ]
