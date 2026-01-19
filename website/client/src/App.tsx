@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Leaderboard } from './pages/Leaderboard';
+import { AgentDetail } from './pages/AgentDetail';
 import { About } from './pages/About';
 
 /**
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/leaderboard" replace />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/agent/:name" element={<AgentDetail />} />
             <Route path="/about" element={<About />} />
             {/* Add more routes here */}
           </Routes>

@@ -43,6 +43,7 @@ class MoveRecordResponse(BaseSchema):
 class GameResponse(BaseSchema):
     id: int | None
     puzzle_id: str
+    puzzle_type: str
     agent_name: str
     failed: bool
     moves: list[MoveRecordResponse] = Field(default_factory=list)

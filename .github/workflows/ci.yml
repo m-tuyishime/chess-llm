@@ -7,7 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  library-quality:
+    name: Library Quality (Lint, Type Check, Test)
     runs-on: ubuntu-latest
     env:
       UV_LINK_MODE: copy
@@ -39,7 +40,8 @@ jobs:
       - name: Test with pytest
         run: uv run pytest
 
-  frontend-lint:
+  website-quality:
+    name: Website Quality (Lint, Type Check)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

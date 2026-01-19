@@ -47,7 +47,7 @@ async def get_leaderboard(
     return [AgentRankingResponse.model_validate(r) for r in repository.get_leaderboard()]
 
 
-@app.get("/api/agents/{name}", response_model=AgentDetailResponse)
+@app.get("/api/agents/{name:path}", response_model=AgentDetailResponse)
 async def get_agent_detail(
     name: str, repository: Annotated[GameRepository, Depends(get_repository)]
 ) -> AgentDetailResponse:

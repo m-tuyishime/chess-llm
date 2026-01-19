@@ -59,7 +59,7 @@ export function Navbar() {
         <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
           About
         </Link>
-        <div className="flex gap-2">
+        <div className="nav-actions">
           <button className="btn btn-secondary" onClick={toggleTheme} title="Toggle Theme">
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
