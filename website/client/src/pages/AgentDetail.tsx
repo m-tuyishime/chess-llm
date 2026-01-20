@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { AgentDetailResponse } from '../api/types';
 import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } from 'lucide-react';
@@ -10,6 +10,7 @@ import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } f
  */
 export function AgentDetail() {
   const { name } = useParams<{ name: string }>();
+  const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -235,7 +236,11 @@ export function AgentDetail() {
             <tbody>
               {currentGames.length > 0 ? (
                 currentGames.map((game, i) => (
-                  <tr key={game.id || i} className="game-row">
+                  <tr
+                    key={game.id || i}
+                    className="game-row cursor-pointer hover:bg-slate-800/50 transition-colors"
+                    onClick={() => navigate(`/replay/${game.id}`)}
+                  >
                     <td>
                       {game.failed ? (
                         <span className="status-badge status-failed">
