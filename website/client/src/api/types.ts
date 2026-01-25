@@ -32,6 +32,8 @@ export interface GameResponse {
   puzzle_id: string;
   puzzle_type: string;
   agent_name: string;
+  white_agent_name: string;
+  black_agent_name: string;
   failed: boolean;
   moves: MoveRecordResponse[];
   date: string; // ISO 8601 string

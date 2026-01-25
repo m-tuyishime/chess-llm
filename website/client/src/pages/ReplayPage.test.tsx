@@ -101,8 +101,8 @@ describe('ReplayPage', () => {
 
     // Check Board Customization (Slate Theme)
     const boardProps = JSON.parse(screen.getByTestId('board-props').textContent || '{}');
-    expect(boardProps.customDarkSquareStyle).toEqual({ backgroundColor: '#334155' });
-    expect(boardProps.customLightSquareStyle).toEqual({ backgroundColor: '#94a3b8' });
+    expect(boardProps.options.darkSquareStyle).toEqual({ backgroundColor: '#334155' });
+    expect(boardProps.options.lightSquareStyle).toEqual({ backgroundColor: '#94a3b8' });
   });
 
   it('renders premium control buttons with accessibility labels', async () => {
