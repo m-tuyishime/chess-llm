@@ -16,6 +16,8 @@ interface AnalysisBannerProps {
   hallucinatedSquare: string | null;
   /** The target square of an illegal move, if any */
   illegalSquare: string | null;
+  /** Detailed analysis message from the hook */
+  analysisMessage?: string | null;
 }
 
 /**
@@ -24,12 +26,14 @@ interface AnalysisBannerProps {
  * @param props.currentMove - The current move record being displayed.
  * @param props.hallucinatedSquare - The square where a piece was hallucinated, if any.
  * @param props.illegalSquare - The target square of an illegal move, if any.
+ * @param props.analysisMessage - Detailed analysis message from the hook.
  * @returns The rendered banner or null.
  */
 export function AnalysisBanner({
   currentMove,
   hallucinatedSquare,
   illegalSquare,
+  analysisMessage,
 }: AnalysisBannerProps) {
   if (!currentMove) return null;
 
@@ -45,23 +49,31 @@ export function AnalysisBanner({
   const targetSq = parsed ? parsed.targetSquare : '?';
   const actualMove = currentMove.actual_move || '?';
 
-  let message = '';
+  let message = analysisMessage || '';
 
-  if (isIllegal) {
-    if (hallucinatedSquare) {
-      message = `The agent tried to move a non-existent ${pieceType} to ${targetSq} (Hallucination).`;
-    } else if (illegalSquare) {
-      message = `The agent tried to move ${pieceType} to ${targetSq}, but it was an illegal move.`;
+  if (!message) {
+    if (isIllegal) {
+      if (hallucinatedSquare) {
+        message = `The agent tried to move a non-existent ${pieceType} to ${targetSq} (Hallucination).`;
+      } else if (illegalSquare) {
+        message = `The agent tried to move ${pieceType} to ${targetSq}, but it was an illegal move.`;
+      } else {
+        message = `The agent selected an illegal move (${actualMove}).`;
+      }
     } else {
-      message = `The agent selected an illegal move (${actualMove}).`;
+      message = `The agent played ${actualMove}, but the optimal move was ${currentMove.expected_move}.`;
     }
-  } else {
-    message = `The agent played ${actualMove}, but the optimal move was ${currentMove.expected_move}.`;
   }
+
+  const title = analysisMessage?.includes('unusual')
+    ? 'Unusual Notation'
+    : isIllegal
+      ? 'Illegal Move'
+      : 'Incorrect Move';
 
   return (
     <div className="analysis-banner-wrapper">
-      <div className="analysis-banner-title">{isIllegal ? 'Illegal Move' : 'Incorrect Move'}</div>
+      <div className="analysis-banner-title">{title}</div>
       <div className="analysis-banner-message">{message}</div>
     </div>
   );

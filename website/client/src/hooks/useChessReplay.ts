@@ -36,6 +36,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
   const [customSquareStyles, setCustomSquareStyles] = useState<Record<string, React.CSSProperties>>(
     {}
   );
+  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null);
 
   // Illegal/Hallucination State
   const [hallucinatedSquare, setHallucinatedSquare] = useState<string | null>(null);
@@ -142,6 +143,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       // Reset special states when maneuvering
       setHallucinatedSquare(null);
       setIllegalSquare(null);
+      setAnalysisMessage(null);
 
       if (index === -1) {
         const base = getBaseChess();
@@ -171,6 +173,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       if (moveRecord?.is_illegal) {
         // Handle Illegal State
         const analysis = analyzeIllegalMove(baseFen, moveRecord.actual_move, agentColor);
+        setAnalysisMessage(analysis.description || null);
 
         let displayFen = baseFen;
 
@@ -243,6 +246,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
     customSquareStyles,
     hallucinatedSquare,
     illegalSquare,
+    analysisMessage,
     goToMove,
   };
 }

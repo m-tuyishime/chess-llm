@@ -60,6 +60,7 @@ export function MoveHistory({
         // Illegal: Retry means next move is also White.
         // Close this row so next White move gets a new line.
         rows.push(currentRow);
+        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
         // expectedColor stays 'white'
       }
@@ -68,6 +69,7 @@ export function MoveHistory({
       // If Black slot is taken (unlikely unless logic error)
       if (currentRow.black) {
         rows.push(currentRow);
+        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
       }
 
@@ -82,6 +84,7 @@ export function MoveHistory({
       } else {
         // Illegal: Retry means next move is also Black.
         rows.push(currentRow);
+        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
         // expectedColor stays 'black'
       }
