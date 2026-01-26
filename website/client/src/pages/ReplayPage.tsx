@@ -100,8 +100,7 @@ export function ReplayPage() {
     goToMove,
     hallucinatedSquare,
     illegalSquare,
-    analysisMessage,
-    goToMove,
+    analysisResult,
   } = useChessReplay({
     initialFen,
     gameMoves,
@@ -382,7 +381,7 @@ export function ReplayPage() {
                 currentMove={currentMoveIndex >= 0 ? game?.moves[currentMoveIndex] : null}
                 hallucinatedSquare={hallucinatedSquare}
                 illegalSquare={illegalSquare}
-                analysisMessage={analysisMessage}
+                analysisResult={analysisResult}
               />
             </div>
           </div>

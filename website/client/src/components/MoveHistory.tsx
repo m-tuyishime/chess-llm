@@ -46,7 +46,7 @@ export function MoveHistory({
 
   moves.forEach((move, index) => {
     if (expectedColor === 'white') {
-      // If White slot is already taken (should theoretically happen if we didn't push, but our logic pushes)
+      // If White slot is already taken
       if (currentRow.white) {
         rows.push(currentRow);
         currentRow = { number: currentNumber, white: null, black: null };
@@ -58,18 +58,13 @@ export function MoveHistory({
         expectedColor = 'black';
       } else {
         // Illegal: Retry means next move is also White.
-        // Close this row so next White move gets a new line.
         rows.push(currentRow);
-        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
-        // expectedColor stays 'white'
       }
     } else {
       // Expected Black
-      // If Black slot is taken (unlikely unless logic error)
       if (currentRow.black) {
         rows.push(currentRow);
-        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
       }
 
@@ -84,9 +79,7 @@ export function MoveHistory({
       } else {
         // Illegal: Retry means next move is also Black.
         rows.push(currentRow);
-        currentNumber++;
         currentRow = { number: currentNumber, white: null, black: null };
-        // expectedColor stays 'black'
       }
     }
   });

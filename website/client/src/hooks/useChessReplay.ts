@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
-import { analyzeIllegalMove, parseMove } from '../lib/chess-logic';
+import { analyzeIllegalMove, IllegalMoveAnalysis } from '../lib/chess-logic';
 import { MoveRecordResponse } from '../api/types';
 
 // Shared type (could be moved to types.ts)
@@ -36,11 +36,11 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
   const [customSquareStyles, setCustomSquareStyles] = useState<Record<string, React.CSSProperties>>(
     {}
   );
-  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null);
 
   // Illegal/Hallucination State
   const [hallucinatedSquare, setHallucinatedSquare] = useState<string | null>(null);
   const [illegalSquare, setIllegalSquare] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<IllegalMoveAnalysis | null>(null);
 
   // Computed Initial State
   const getBaseChess = useCallback(() => {
@@ -107,10 +107,17 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
             });
           }
         } catch {
-          // Illegal move - try to parse target square
-          const parsed = parseMove(moveRecord.actual_move);
-          if (parsed && parsed.targetSquare) {
-            newCustomSquares[parsed.targetSquare] = {
+          // Illegal move - try to get analyzed source/target
+          const analysis = analyzeIllegalMove(currentFen, moveRecord.actual_move, agentColor);
+          if (analysis.targetSquare) {
+            if (analysis.sourceSquare) {
+              newArrows.push({
+                startSquare: analysis.sourceSquare,
+                endSquare: analysis.targetSquare,
+                color: 'rgba(239, 68, 68, 0.9)', // Red color
+              });
+            }
+            newCustomSquares[analysis.targetSquare] = {
               background: 'rgba(255, 0, 0, 0.4)',
             };
           }
@@ -120,7 +127,6 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       setArrows(newArrows);
 
       // Apply hallucination red background if needed
-      // (Note: The hook manages the logic calculation, but state is passed down)
       if (hallucinatedSquare) {
         newCustomSquares[hallucinatedSquare] = {
           ...newCustomSquares[hallucinatedSquare],
@@ -130,8 +136,8 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
 
       setCustomSquareStyles(newCustomSquares);
     },
-    [gameMoves, getBaseChess, hallucinatedSquare]
-  ); // hallucinatedSquare dependency is key
+    [gameMoves, getBaseChess, hallucinatedSquare, agentColor]
+  );
 
   // Sync visuals when special states change
   useEffect(() => {
@@ -143,7 +149,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       // Reset special states when maneuvering
       setHallucinatedSquare(null);
       setIllegalSquare(null);
-      setAnalysisMessage(null);
+      setAnalysisResult(null);
 
       if (index === -1) {
         const base = getBaseChess();
@@ -173,21 +179,12 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       if (moveRecord?.is_illegal) {
         // Handle Illegal State
         const analysis = analyzeIllegalMove(baseFen, moveRecord.actual_move, agentColor);
-        setAnalysisMessage(analysis.description || null);
+        setAnalysisResult(analysis);
 
         let displayFen = baseFen;
 
         if (analysis.type === 'hallucination') {
           setHallucinatedSquare(analysis.targetSquare);
-          // Generate hallucinated board state
-          if (analysis.targetSquare) {
-            // We need the piece type char (P, N, B, etc.)
-            // analysis.pieceType is 'p', 'n', etc.
-            // We need valid casing for FEN? defineIllegalStateFen handles it if we pass correct params
-            // We need to pass logic.
-            // Let's assume we can generate it.
-            // We need to remove source if it exists? analyzeIllegalMove checks source.
-          }
         }
 
         if (analysis.targetSquare) {
@@ -226,7 +223,6 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       }
 
       setCurrentMoveIndex(index);
-      // updateArrows is handled by useEffect
     },
     [gameMoves, getBaseChess, agentColor]
   );
@@ -246,7 +242,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
     customSquareStyles,
     hallucinatedSquare,
     illegalSquare,
-    analysisMessage,
+    analysisResult,
     goToMove,
   };
 }

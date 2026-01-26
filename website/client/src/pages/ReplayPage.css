@@ -310,6 +310,31 @@
   }
 }
 
+/* Blinking Arrow Animation */
+@keyframes blink-arrow {
+  0% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+  }
+  50% {
+    opacity: 0.2;
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  100% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+  }
+}
+
+/* We target the arrows by identifying their color in the SVG */
+/* react-chessboard renders arrows as SVG paths */
+svg polygon[fill="rgba(239, 68, 68, 0.9)"],
+svg line[stroke="rgba(239, 68, 68, 0.9)"],
+svg path[stroke="rgba(239, 68, 68, 0.9)"],
+svg path[fill="rgba(239, 68, 68, 0.9)"] {
+  animation: blink-arrow 1s infinite !important;
+}
+
 /* Move History Table */
 .move-history-table {
   width: 100%;
