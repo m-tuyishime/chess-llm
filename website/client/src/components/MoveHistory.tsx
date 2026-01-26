@@ -13,6 +13,14 @@ interface MoveHistoryProps {
   currentMoveIndex: number;
   /** Callback to navigate to a specific move index */
   goToMove: (index: number) => void;
+  /** The color of the side that makes the first move */
+  startColor?: 'white' | 'black';
+}
+
+interface HistoryRow {
+  number: number;
+  white: { move: MoveRecordResponse; index: number } | null;
+  black: { move: MoveRecordResponse; index: number } | null;
 }
 
 /**
@@ -21,10 +29,69 @@ interface MoveHistoryProps {
  * @param props.moves - List of move records to display.
  * @param props.currentMoveIndex - Index of the currently selected move.
  * @param props.goToMove - Callback to navigate to a specific move index.
+ * @param props.startColor - The color of the side that makes the first move.
  * @returns The rendered component.
  */
-export function MoveHistory({ moves, currentMoveIndex, goToMove }: MoveHistoryProps) {
-  const rowCount = Math.ceil((moves.length || 0) / 2);
+export function MoveHistory({
+  moves,
+  currentMoveIndex,
+  goToMove,
+  startColor = 'white',
+}: MoveHistoryProps) {
+  // Group moves into rows handling retries and illegal moves
+  const rows: HistoryRow[] = [];
+  let currentNumber = 1;
+  let currentRow: HistoryRow = { number: 1, white: null, black: null };
+  let expectedColor = startColor;
+
+  moves.forEach((move, index) => {
+    if (expectedColor === 'white') {
+      // If White slot is already taken (should theoretically happen if we didn't push, but our logic pushes)
+      if (currentRow.white) {
+        rows.push(currentRow);
+        currentRow = { number: currentNumber, white: null, black: null };
+      }
+
+      currentRow.white = { move, index };
+
+      if (!move.is_illegal) {
+        expectedColor = 'black';
+      } else {
+        // Illegal: Retry means next move is also White.
+        // Close this row so next White move gets a new line.
+        rows.push(currentRow);
+        currentRow = { number: currentNumber, white: null, black: null };
+        // expectedColor stays 'white'
+      }
+    } else {
+      // Expected Black
+      // If Black slot is taken (unlikely unless logic error)
+      if (currentRow.black) {
+        rows.push(currentRow);
+        currentRow = { number: currentNumber, white: null, black: null };
+      }
+
+      currentRow.black = { move, index };
+
+      if (!move.is_illegal) {
+        // Legal: Turn ends.
+        rows.push(currentRow);
+        currentNumber++;
+        currentRow = { number: currentNumber, white: null, black: null };
+        expectedColor = 'white';
+      } else {
+        // Illegal: Retry means next move is also Black.
+        rows.push(currentRow);
+        currentRow = { number: currentNumber, white: null, black: null };
+        // expectedColor stays 'black'
+      }
+    }
+  });
+
+  // Push final partial row if exists
+  if (currentRow.white || currentRow.black) {
+    rows.push(currentRow);
+  }
 
   return (
     <div className="move-history-container">
@@ -45,35 +112,35 @@ export function MoveHistory({ moves, currentMoveIndex, goToMove }: MoveHistoryPr
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: rowCount }).map((_, i) => {
-              const whiteMoveIndex = i * 2;
-              const blackMoveIndex = i * 2 + 1;
-              const whiteMove = moves[whiteMoveIndex];
-              const blackMove = moves[blackMoveIndex];
-              const isCurrentRow = Math.floor(currentMoveIndex / 2) === i;
+            {rows.map((row, i) => {
+              const { white, black } = row;
+              // Check if either move is the current one
+              const isCurrentRow =
+                (white && white.index === currentMoveIndex) ||
+                (black && black.index === currentMoveIndex);
 
               return (
                 <tr key={i} className={isCurrentRow ? 'current-row' : ''}>
-                  <td className="td-number">{i + 1}.</td>
+                  <td className="td-number">{row.number}.</td>
 
                   {/* White Move */}
                   <td
-                    onClick={() => whiteMove && goToMove(whiteMoveIndex)}
-                    className={`history-cell ${currentMoveIndex === whiteMoveIndex ? 'active' : ''} ${whiteMove?.is_illegal ? 'illegal' : ''}`}
-                    style={{ cursor: whiteMove ? 'pointer' : 'default' }}
+                    onClick={() => white && goToMove(white.index)}
+                    className={`history-cell ${white && currentMoveIndex === white.index ? 'active' : ''} ${white?.move.is_illegal ? 'illegal' : ''}`}
+                    style={{ cursor: white ? 'pointer' : 'default' }}
                   >
-                    {whiteMove ? whiteMove.actual_move : ''}
-                    {whiteMove?.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                    {white ? white.move.actual_move : ''}
+                    {white?.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
                   </td>
 
                   {/* Black Move */}
                   <td
-                    onClick={() => blackMove && goToMove(blackMoveIndex)}
-                    className={`history-cell ${currentMoveIndex === blackMoveIndex ? 'active' : ''} ${blackMove?.is_illegal ? 'illegal' : ''}`}
-                    style={{ cursor: blackMove ? 'pointer' : 'default' }}
+                    onClick={() => black && goToMove(black.index)}
+                    className={`history-cell ${black && currentMoveIndex === black.index ? 'active' : ''} ${black?.move.is_illegal ? 'illegal' : ''}`}
+                    style={{ cursor: black ? 'pointer' : 'default' }}
                   >
-                    {blackMove ? blackMove.actual_move : ''}
-                    {blackMove?.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                    {black ? black.move.actual_move : ''}
+                    {black?.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
                   </td>
                 </tr>
               );

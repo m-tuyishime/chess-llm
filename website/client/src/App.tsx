@@ -19,7 +19,7 @@ function AppLayout() {
         <Routes>
           <Route path="/" element={<Navigate to="/leaderboard" replace />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/agent/:name" element={<AgentDetail />} />
+          <Route path="/agent/*" element={<AgentDetail />} />
           <Route path="/replay/:gameId" element={<ReplayPage />} />
           <Route path="/about" element={<About />} />
         </Routes>

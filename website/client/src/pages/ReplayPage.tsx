@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 import { ArrowLeft, ArrowRight, SkipBack, SkipForward, Menu, X } from 'lucide-react';
 import { api } from '../api/client';
 import { GameResponse, PuzzleResponse } from '../api/types';
@@ -27,6 +28,7 @@ export function ReplayPage() {
   // Config State
   const [initialFen, setInitialFen] = useState<string>('');
   const [agentColor, setAgentColor] = useState<'white' | 'black'>('white');
+  const [puzzleStartColor, setPuzzleStartColor] = useState<'white' | 'black'>('white');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Load Data
@@ -50,13 +52,30 @@ export function ReplayPage() {
 
         setInitialFen(puzzleFen);
 
-        if (puzzleFen) {
-          // Basic Fen parsing to determine color
+        // Determine Puzzle Start Color (for MoveHistory)
+        const startChess = new Chess(puzzleFen || undefined);
+        setPuzzleStartColor(startChess.turn() === 'w' ? 'white' : 'black');
+
+        // Determine Agent Color
+        // Look for the first move with tokens (Agent's move)
+        const firstAgentMove = gameData.moves.find(
+          (m) => (m.completion_tokens || 0) > 0 || (m.prompt_tokens || 0) > 0
+        );
+
+        if (firstAgentMove) {
+          const index = gameData.moves.indexOf(firstAgentMove);
+          const tempChess = new Chess(puzzleFen || undefined);
+          for (let i = 0; i < index; i++) {
+            try {
+              tempChess.move(gameData.moves[i].actual_move);
+            } catch {
+              // Ignore invalid setup moves
+            }
+          }
+          setAgentColor(tempChess.turn() === 'w' ? 'white' : 'black');
+        } else if (puzzleFen) {
           const tokens = puzzleFen.split(' ');
-          const sideToMove = tokens[1]; // 'w' or 'b'
-          // Agent matches the puzzle solver color (who is about to move)
-          // Wait, in Lichess puzzles, FEN is usually start position.
-          // Side to move IS the player.
+          const sideToMove = tokens[1];
           setAgentColor(sideToMove === 'w' ? 'white' : 'black');
         } else {
           setAgentColor('white');
@@ -72,6 +91,7 @@ export function ReplayPage() {
   }, [gameId]);
 
   // Chess Logic Hook
+  const gameMoves = useMemo(() => game?.moves || [], [game]);
   const {
     boardPosition,
     arrows,
@@ -82,7 +102,7 @@ export function ReplayPage() {
     illegalSquare,
   } = useChessReplay({
     initialFen,
-    gameMoves: game?.moves || [],
+    gameMoves,
     agentColor,
   });
 
@@ -322,6 +342,7 @@ export function ReplayPage() {
               moves={game.moves}
               currentMoveIndex={currentMoveIndex}
               goToMove={goToMove}
+              startColor={puzzleStartColor}
             />
           </div>
         </div>

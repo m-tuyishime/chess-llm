@@ -9,7 +9,8 @@ import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } f
  * Displays statistics and game history for a specific agent.
  */
 export function AgentDetail() {
-  const { name } = useParams<{ name: string }>();
+  const params = useParams();
+  const name = params['*'];
   const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
