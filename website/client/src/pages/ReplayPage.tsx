@@ -8,6 +8,7 @@ import { GameResponse, PuzzleResponse } from '../api/types';
 import { useChessReplay } from '../hooks/useChessReplay';
 import { AnalysisBanner } from '../components/AnalysisBanner';
 import { MoveHistory } from '../components/MoveHistory';
+import { BoardArrows } from '../components/BoardArrows';
 import './ReplayPage.css';
 
 /**
@@ -177,13 +178,13 @@ export function ReplayPage() {
                 position: boardPosition,
                 boardOrientation: agentColor,
                 animationDurationInMs: 250,
-                arrows: arrows,
                 squareStyles: customSquareStyles,
                 boardStyle: { borderRadius: '4px', boxShadow: 'none' },
                 darkSquareStyle: { backgroundColor: '#334155' },
                 lightSquareStyle: { backgroundColor: '#94a3b8' },
               }}
             />
+            <BoardArrows arrows={arrows} orientation={agentColor} agentColor={agentColor} />
           </div>
         </div>
 

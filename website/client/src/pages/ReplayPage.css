@@ -326,13 +326,8 @@
   }
 }
 
-/* We target the arrows by identifying their color in the SVG */
-/* react-chessboard renders arrows as SVG paths */
-svg polygon[fill="rgba(239, 68, 68, 0.9)"],
-svg line[stroke="rgba(239, 68, 68, 0.9)"],
-svg path[stroke="rgba(239, 68, 68, 0.9)"],
-svg path[fill="rgba(239, 68, 68, 0.9)"] {
-  animation: blink-arrow 1s infinite !important;
+.blinking-arrow {
+  animation: blink-arrow 1s infinite;
 }
 
 /* Move History Table */
