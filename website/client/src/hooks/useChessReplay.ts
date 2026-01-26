@@ -96,31 +96,19 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
 
       // 2. Actual/Illegal Move Arrow (Red)
       if (moveRecord.actual_move && moveRecord.actual_move !== moveRecord.expected_move) {
-        const actualState = new Chess(currentFen);
-        try {
-          const result = actualState.move(moveRecord.actual_move);
-          if (result) {
+        // Illegal move - get analyzed source/target
+        const analysis = analyzeIllegalMove(currentFen, moveRecord.actual_move, agentColor);
+        if (analysis.targetSquare) {
+          if (analysis.sourceSquare) {
             newArrows.push({
-              startSquare: result.from,
-              endSquare: result.to,
-              color: 'rgba(239, 68, 68, 0.9)',
+              startSquare: analysis.sourceSquare,
+              endSquare: analysis.targetSquare,
+              color: 'rgba(239, 68, 68, 0.9)', // Red color
             });
           }
-        } catch {
-          // Illegal move - try to get analyzed source/target
-          const analysis = analyzeIllegalMove(currentFen, moveRecord.actual_move, agentColor);
-          if (analysis.targetSquare) {
-            if (analysis.sourceSquare) {
-              newArrows.push({
-                startSquare: analysis.sourceSquare,
-                endSquare: analysis.targetSquare,
-                color: 'rgba(239, 68, 68, 0.9)', // Red color
-              });
-            }
-            newCustomSquares[analysis.targetSquare] = {
-              background: 'rgba(255, 0, 0, 0.4)',
-            };
-          }
+          newCustomSquares[analysis.targetSquare] = {
+            background: 'rgba(255, 0, 0, 0.4)',
+          };
         }
       }
 
@@ -192,14 +180,29 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
 
           // Prepare the visualized board
           const checkState = new Chess(baseFen);
+
+          // Determine intended piece attributes for visualization
+          let movePieceColor = agentColor === 'white' ? 'w' : 'b';
+          let movePieceType = analysis.pieceType as PieceSymbol;
+
           if (analysis.sourceSquare) {
-            checkState.remove(analysis.sourceSquare as Square);
+            const pieceAtSource = checkState.get(analysis.sourceSquare as Square);
+            if (pieceAtSource) {
+              // Match the actual piece that was moved (handle ownership hallucination)
+              movePieceColor = pieceAtSource.color;
+              movePieceType = pieceAtSource.type;
+
+              // Only remove from source if it belongs to the agent
+              // (If moving opponent piece, keep the original piece visible)
+              if (pieceAtSource.color === (agentColor === 'white' ? 'w' : 'b')) {
+                checkState.remove(analysis.sourceSquare as Square);
+              }
+            }
           }
 
-          const turnColor = agentColor === 'white' ? 'w' : 'b';
-          if (analysis.pieceType) {
+          if (movePieceType) {
             checkState.put(
-              { type: analysis.pieceType as PieceSymbol, color: turnColor as Color },
+              { type: movePieceType, color: movePieceColor as Color },
               analysis.targetSquare as Square
             );
           }
