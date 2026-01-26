@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { ArrowLeft, ArrowRight, SkipBack, SkipForward, Menu, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, SkipBack, SkipForward, Menu, X, ExternalLink } from 'lucide-react';
 import { api } from '../api/client';
 import { GameResponse, PuzzleResponse } from '../api/types';
 import { useChessReplay } from '../hooks/useChessReplay';
@@ -315,15 +315,63 @@ export function ReplayPage() {
             <div style={{ padding: '1rem' }}>
               {puzzle && (
                 <div
-                  style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    marginBottom: '1rem',
+                  }}
                 >
-                  <div>
-                    <div className="stat-label">Rating</div>
-                    <div className="stat-value">{puzzle.rating}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div>
+                      <div className="stat-label">Rating</div>
+                      <div className="stat-value">{puzzle.rating}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div className="stat-label">Popularity</div>
+                      <div className="stat-value">{puzzle.popularity}%</div>
+                    </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div className="stat-label">Popularity</div>
-                    <div className="stat-value">{puzzle.popularity}%</div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.5rem',
+                      background: 'var(--bg-app)',
+                      borderRadius: 'var(--radius-sm)',
+                    }}
+                  >
+                    <div>
+                      <div className="stat-label" style={{ marginBottom: '0.125rem' }}>
+                        Puzzle ID
+                      </div>
+                      <div
+                        className="stat-value"
+                        style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}
+                      >
+                        {puzzle.id}
+                      </div>
+                    </div>
+                    <a
+                      href={`https://lichess.org/training/${puzzle.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-control"
+                      style={{
+                        width: 'auto',
+                        height: 'auto',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        gap: '0.25rem',
+                        textDecoration: 'none',
+                      }}
+                      title="Open on Lichess"
+                    >
+                      <ExternalLink size={14} />
+                      Open
+                    </a>
                   </div>
                 </div>
               )}
