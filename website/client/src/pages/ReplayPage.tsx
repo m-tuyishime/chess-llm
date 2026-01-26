@@ -291,8 +291,9 @@ export function ReplayPage() {
                 <span>Playing as:</span>
                 <span
                   style={{
-                    color: agentColor === 'white' ? '#e0e0e0' : '#1a1a1a',
-                    background: agentColor === 'white' ? '#ffffff' : '#000000',
+                    color: agentColor === 'white' ? '#1a1a1a' : '#ffffff',
+                    background: agentColor === 'white' ? '#ffffff' : '#1a1a1a',
+                    border: agentColor === 'white' ? '1px solid #e0e0e0' : '1px solid #333333',
                     padding: '0.125rem 0.5rem',
                     borderRadius: '4px',
                     textTransform: 'capitalize',
@@ -382,7 +383,7 @@ export function ReplayPage() {
                 currentMove={currentMoveIndex >= 0 ? game?.moves[currentMoveIndex] : null}
                 hallucinatedSquare={hallucinatedSquare}
                 illegalSquare={illegalSquare}
-                analysisResult={analysisResult}
+                analysisResult={analysisResult || undefined}
               />
             </div>
           </div>

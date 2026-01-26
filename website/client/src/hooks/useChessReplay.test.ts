@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { useChessReplay } from './useChessReplay';
+import { MoveRecordResponse } from '../api/types';
 
 describe('useChessReplay', () => {
   const mockMoves = [
@@ -19,7 +20,7 @@ describe('useChessReplay', () => {
   it('initializes correctly', () => {
     const { result } = renderHook(() =>
       useChessReplay({
-        gameMoves: mockMoves,
+        gameMoves: mockMoves as unknown as MoveRecordResponse[],
         agentColor: 'white',
       })
     );
@@ -33,7 +34,7 @@ describe('useChessReplay', () => {
   it('navigates to next move', () => {
     const { result } = renderHook(() =>
       useChessReplay({
-        gameMoves: mockMoves,
+        gameMoves: mockMoves as unknown as MoveRecordResponse[],
         agentColor: 'white',
       })
     );
@@ -55,7 +56,7 @@ describe('useChessReplay', () => {
     const { result } = renderHook(() =>
       useChessReplay({
         initialFen: noQueenFen,
-        gameMoves: illegalMoves,
+        gameMoves: illegalMoves as unknown as MoveRecordResponse[],
         agentColor: 'white',
       })
     );
@@ -77,7 +78,7 @@ describe('useChessReplay', () => {
     const { result } = renderHook(() =>
       useChessReplay({
         initialFen: noQueenFen,
-        gameMoves: illegalMoves,
+        gameMoves: illegalMoves as unknown as MoveRecordResponse[],
         agentColor: 'white',
       })
     );

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Arrow } from '../hooks/useChessReplay';
 
 interface BoardArrowsProps {
@@ -35,7 +34,15 @@ const buildArrowHeadPoints = (strokeWidth: number) => {
   return `${tipX},0 ${baseX},-${halfH} ${baseX},${halfH}`;
 };
 
-export const BoardArrows: React.FC<BoardArrowsProps> = ({ arrows, orientation, agentColor }) => {
+/**
+ * Component to render custom chess board arrows with curved corners and borders.
+ * @param props - The component props.
+ * @param props.arrows - The list of arrows to render.
+ * @param props.orientation - The orientation of the board.
+ * @param props.agentColor - The color of the agent (used for arrow borders).
+ * @returns The BoardArrows component.
+ */
+export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProps) {
   if (arrows.length === 0) return null;
 
   const borderColor = agentColor === 'white' ? 'white' : 'black';
@@ -159,4 +166,4 @@ export const BoardArrows: React.FC<BoardArrowsProps> = ({ arrows, orientation, a
       })}
     </svg>
   );
-};
+}
