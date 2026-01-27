@@ -23,10 +23,8 @@ const mockAgentDetail = {
     puzzle_id: `puzzle-${i}`,
     puzzle_type: i % 2 === 0 ? 'MateIn2' : 'Opening',
     agent_name: 'Agent-001',
-    white_agent_name: 'Agent-001',
-    black_agent_name: 'Stockfish',
     failed: i % 3 === 0, // Some failed, some success (failed=false means success)
-    moves: [],
+    move_count: 5,
     date: new Date().toISOString(),
   })),
 };
