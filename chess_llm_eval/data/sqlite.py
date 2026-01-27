@@ -252,7 +252,7 @@ class SQLiteRepository:
     def get_all_agents(self) -> list[AgentData]:
         # Fetch all agents in one go with their latest benchmark stats
         query = """
-            SELECT 
+            SELECT
                 a.*,
                 b.agent_rating as last_rating,
                 b.agent_deviation as last_rd,
@@ -362,7 +362,7 @@ class SQLiteRepository:
     def get_leaderboard(self) -> list[AgentRanking]:
         # Get all agents and stats in a single query with efficient grouping
         query = """
-            SELECT 
+            SELECT
                 a.name,
                 a.rating as current_rating,
                 a.rd as current_rd,
