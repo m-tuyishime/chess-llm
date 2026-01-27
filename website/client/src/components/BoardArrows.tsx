@@ -45,7 +45,6 @@ const buildArrowHeadPoints = (strokeWidth: number) => {
 export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProps) {
   if (arrows.length === 0) return null;
 
-  const borderColor = agentColor === 'white' ? 'white' : 'black';
   const squareWidth = VIEWBOX_SIZE / BOARD_SIZE;
   const strokeWidth = squareWidth / ARROW_WIDTH_DENOMINATOR;
   const borderStrokeWidth = strokeWidth * 1.3;
@@ -138,6 +137,7 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
         const isRed = arrow.color.includes('239, 68, 68');
         const arrowHeadPoints = buildArrowHeadPoints(strokeWidth);
         const borderArrowHeadPoints = buildArrowHeadPoints(borderStrokeWidth);
+        const borderColor = arrow.borderColor || (agentColor === 'white' ? 'white' : 'black');
 
         return (
           <g

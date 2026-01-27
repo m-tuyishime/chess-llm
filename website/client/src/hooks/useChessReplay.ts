@@ -8,6 +8,7 @@ export type Arrow = {
   startSquare: string;
   endSquare: string;
   color: string;
+  borderColor?: string;
 };
 
 /**
@@ -76,6 +77,8 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
         }
       }
       const currentFen = tempChess.fen();
+      const currentTurn = tempChess.turn();
+      const arrowBorderColor = currentTurn === 'w' ? 'white' : 'black';
 
       // 1. Expected Move Arrow (Green)
       if (moveRecord.expected_move) {
@@ -87,6 +90,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
               startSquare: result.from,
               endSquare: result.to,
               color: 'rgba(34, 197, 94, 0.9)',
+              borderColor: arrowBorderColor,
             });
           }
         } catch {
@@ -104,6 +108,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
               startSquare: analysis.sourceSquare,
               endSquare: analysis.targetSquare,
               color: 'rgba(239, 68, 68, 0.9)', // Red color
+              borderColor: arrowBorderColor,
             });
           }
           newCustomSquares[analysis.targetSquare] = {
