@@ -113,6 +113,10 @@ class SQLiteRepository:
             )
         """)
 
+        # Indexes for performance
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_game_agent_name ON game(agent_name)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_move_game_id ON move(game_id)")
+
         self.conn.commit()
 
     # --- Puzzle Management ---
@@ -246,13 +250,43 @@ class SQLiteRepository:
         self.conn.commit()
 
     def get_all_agents(self) -> list[AgentData]:
-        cursor = self.conn.execute("SELECT name FROM agent")
-        names = [row["name"] for row in cursor.fetchall()]
+        # Fetch all agents in one go with their latest benchmark stats
+        query = """
+            SELECT 
+                a.*,
+                b.agent_rating as last_rating,
+                b.agent_deviation as last_rd,
+                b.agent_volatility as last_vol
+            FROM agent a
+            LEFT JOIN (
+                SELECT g.agent_name, b.*
+                FROM benchmark b
+                JOIN game g ON b.game_id = g.id
+                WHERE b.id IN (
+                    SELECT MAX(b2.id)
+                    FROM benchmark b2
+                    JOIN game g2 ON b2.game_id = g2.id
+                    GROUP BY g2.agent_name
+                )
+            ) b ON a.name = b.agent_name
+        """
+        cursor = self.conn.execute(query)
         agents = []
-        for name in names:
-            a = self.get_agent(name)
-            if a:
-                agents.append(a)
+        for row in cursor.fetchall():
+            rating = row["last_rating"] if row["last_rating"] is not None else row["rating"]
+            rd = row["last_rd"] if row["last_rd"] is not None else row["rd"]
+            vol = row["last_vol"] if row["last_vol"] is not None else row["volatility"]
+
+            agents.append(
+                AgentData(
+                    name=row["name"],
+                    is_reasoning=bool(row["reasoning"]),
+                    is_random=bool(row["random"]),
+                    rating=float(rating) if rating is not None else 1500.0,
+                    rd=float(rd) if rd is not None else 350.0,
+                    volatility=float(vol) if vol is not None else 0.06,
+                )
+            )
         return agents
 
     # --- Game Management ---
@@ -326,30 +360,31 @@ class SQLiteRepository:
         return None
 
     def get_leaderboard(self) -> list[AgentRanking]:
-        # Get all agents and calc win rate
-        # This is expensive in pure SQL without nice aggregates, doing python side is ok for now
-        agents = self.get_all_agents()
+        # Get all agents and stats in a single query with efficient grouping
+        query = """
+            SELECT 
+                a.name,
+                a.rating as current_rating,
+                a.rd as current_rd,
+                COUNT(g.id) as total_games,
+                SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) as wins
+            FROM agent a
+            LEFT JOIN game g ON a.name = g.agent_name
+            GROUP BY a.name
+        """
+        cursor = self.conn.execute(query)
         rankings = []
 
-        for agent in agents:
-            # Get wins/games
-            row = self.conn.execute(
-                """
-                SELECT count(*) as total, sum(CASE WHEN failed=0 THEN 1 ELSE 0 END) as wins
-                FROM game WHERE agent_name = ?
-            """,
-                (agent.name,),
-            ).fetchone()
-
-            total = row["total"]
+        for row in cursor.fetchall():
+            total = row["total_games"]
             wins = row["wins"] if row["wins"] else 0
-            win_rate = (wins / total * 100) if total > 0 else 0.0
+            win_rate = (wins / total) if total > 0 else 0.0
 
             rankings.append(
                 AgentRanking(
-                    name=agent.name,
-                    rating=agent.rating,
-                    rd=agent.rd,
+                    name=row["name"],
+                    rating=row["current_rating"],
+                    rd=row["current_rd"],
                     win_rate=win_rate,
                     games_played=total,
                 )
@@ -359,12 +394,15 @@ class SQLiteRepository:
         return rankings
 
     def get_game(self, game_id: int) -> Game | None:
-        cursor = self.conn.execute("""
+        cursor = self.conn.execute(
+            """
             SELECT g.*, p.type as puzzle_type
             FROM game g
             JOIN puzzle p ON g.puzzle_id = p.id
             WHERE g.id = ?
-        """, (game_id,))
+        """,
+            (game_id,),
+        )
         row = cursor.fetchone()
         if not row:
             return None
@@ -375,44 +413,57 @@ class SQLiteRepository:
         )
         moves = [self._map_move(m) for m in move_cursor.fetchall()]
 
+        date_str = row["date"].replace(" ", "T") if row["date"] else datetime.now().isoformat()
+        try:
+            date_obj = datetime.fromisoformat(date_str)
+        except ValueError:
+            # Fallback if format is unexpected
+            date_obj = datetime.now()
+
         return Game(
             id=row["id"],
             puzzle_id=row["puzzle_id"],
             puzzle_type=row["puzzle_type"],
             agent_name=row["agent_name"],
             failed=bool(row["failed"]),
-            date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
+            date=date_obj,
             moves=moves,
+            move_count=len(moves),
         )
 
     def get_agent_games(self, agent_name: str) -> list[Game]:
-        cursor = self.conn.execute("""
-            SELECT g.*, p.type as puzzle_type
+        # Efficiently fetch games and move counts without loading all moves
+        cursor = self.conn.execute(
+            """
+            SELECT g.*, p.type as puzzle_type, COUNT(m.id) as move_count
             FROM game g
             JOIN puzzle p ON g.puzzle_id = p.id
+            LEFT JOIN move m ON g.id = m.game_id
             WHERE g.agent_name = ?
+            GROUP BY g.id
             ORDER BY g.date DESC
-        """, (agent_name,))
+        """,
+            (agent_name,),
+        )
+
         games = []
         for row in cursor.fetchall():
-            # Get moves for each game
-            # Note: N+1 query problem here, but likely acceptable for MVP scale
-            # or we can optimize with a join later if needed.
-            game_id = row["id"]
-            move_cursor = self.conn.execute(
-                "SELECT * FROM move WHERE game_id = ? ORDER BY id", (game_id,)
-            )
-            moves = [self._map_move(m) for m in move_cursor.fetchall()]
+            date_str = row["date"].replace(" ", "T") if row["date"] else datetime.now().isoformat()
+            try:
+                date_obj = datetime.fromisoformat(date_str)
+            except ValueError:
+                date_obj = datetime.now()
 
             games.append(
                 Game(
-                    id=game_id,
+                    id=row["id"],
                     puzzle_id=row["puzzle_id"],
                     puzzle_type=row["puzzle_type"],
                     agent_name=row["agent_name"],
                     failed=bool(row["failed"]),
-                    date=datetime.fromisoformat(row["date"]) if row["date"] else datetime.now(),
-                    moves=moves,
+                    date=date_obj,
+                    moves=[],  # Don't load moves for summary list
+                    move_count=row["move_count"],
                 )
             )
         return games

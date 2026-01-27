@@ -50,6 +50,16 @@ class GameResponse(BaseSchema):
     date: datetime
 
 
+class GameSummaryResponse(BaseSchema):
+    id: int | None
+    puzzle_id: str
+    puzzle_type: str
+    agent_name: str
+    failed: bool
+    move_count: int
+    date: datetime
+
+
 class AgentRankingResponse(BaseSchema):
     name: str
     rating: float
@@ -65,4 +75,4 @@ class AgentDetailResponse(BaseSchema):
     rating: float
     rd: float
     volatility: float
-    games: list[GameResponse] = Field(default_factory=list)
+    games: list[GameSummaryResponse] = Field(default_factory=list)

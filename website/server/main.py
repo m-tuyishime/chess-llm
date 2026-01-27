@@ -8,6 +8,7 @@ from chess_llm_eval.schemas import (
     AgentDetailResponse,
     AgentRankingResponse,
     GameResponse,
+    GameSummaryResponse,
     HealthResponse,
     PuzzleResponse,
 )
@@ -71,7 +72,18 @@ async def get_agent_detail(
         rating=agent.rating,
         rd=agent.rd,
         volatility=agent.volatility,
-        games=[GameResponse.model_validate(g) for g in games],
+        games=[
+            GameSummaryResponse(
+                id=g.id,
+                puzzle_id=g.puzzle_id,
+                puzzle_type=g.puzzle_type,
+                agent_name=g.agent_name,
+                failed=g.failed,
+                move_count=g.move_count,
+                date=g.date,
+            )
+            for g in games
+        ],
     )
 
 

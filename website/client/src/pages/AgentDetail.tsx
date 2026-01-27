@@ -270,17 +270,19 @@ export function AgentDetail() {
                       <span className="type-badge">{game.puzzle_type}</span>
                     </td>
                     <td className="puzzle-id">{game.puzzle_id}</td>
-                    <td className="moves-cell">{game.moves.length}</td>
+                    <td className="moves-cell">{game.move_count}</td>
                   </tr>
+
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     <Hash className="empty-icon" />
                     <p>No games found matching filter.</p>
                   </td>
                 </tr>
               )}
+
             </tbody>
           </table>
         </div>
