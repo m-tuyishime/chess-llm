@@ -64,4 +64,3 @@ export interface AgentDetailResponse {
   volatility: number;
   games: GameSummaryResponse[];
 }
-

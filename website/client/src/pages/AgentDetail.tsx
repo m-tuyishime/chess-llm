@@ -272,7 +272,6 @@ export function AgentDetail() {
                     <td className="puzzle-id">{game.puzzle_id}</td>
                     <td className="moves-cell">{game.move_count}</td>
                   </tr>
-
                 ))
               ) : (
                 <tr>
@@ -282,7 +281,6 @@ export function AgentDetail() {
                   </td>
                 </tr>
               )}
-
             </tbody>
           </table>
         </div>
