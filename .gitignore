@@ -1,5 +1,6 @@
 # Data & Secrets
 data/*.csv
+data/*.db
 data/*.db-*
 .env
 logs/
