@@ -1,4 +1,5 @@
 import { Arrow } from '../hooks/useChessReplay';
+import { ARROW_COLOR_RED } from '../lib/chess-logic';
 
 interface BoardArrowsProps {
   arrows: Arrow[];
@@ -138,7 +139,7 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
           arrowAngleDeg = (angleRad * 180) / Math.PI;
         }
 
-        const isRed = arrow.color.includes('239, 68, 68');
+        const isRed = arrow.color === ARROW_COLOR_RED;
         const arrowHeadPoints = buildArrowHeadPoints(strokeWidth);
         const borderArrowHeadPoints = buildArrowHeadPoints(borderStrokeWidth);
         const borderColor = arrow.borderColor || (agentColor === 'white' ? 'white' : 'black');

@@ -1,6 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
-import { analyzeIllegalMove, IllegalMoveAnalysis } from '../lib/chess-logic';
+import {
+  analyzeIllegalMove,
+  IllegalMoveAnalysis,
+  ARROW_COLOR_RED,
+  ARROW_COLOR_GREEN,
+} from '../lib/chess-logic';
 import { MoveRecordResponse } from '../api/types';
 
 // Shared type (could be moved to types.ts)
@@ -99,7 +104,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
             newArrows.push({
               startSquare: result.from,
               endSquare: result.to,
-              color: 'rgba(34, 197, 94, 0.9)',
+              color: ARROW_COLOR_GREEN,
               borderColor: arrowBorderColor,
             });
           }
@@ -117,7 +122,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
             newArrows.push({
               startSquare: analysis.sourceSquare,
               endSquare: analysis.targetSquare,
-              color: 'rgba(239, 68, 68, 0.9)', // Red color
+              color: ARROW_COLOR_RED, // Red color
               borderColor: arrowBorderColor,
             });
           }

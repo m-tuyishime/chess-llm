@@ -1,5 +1,8 @@
 import { Chess, PieceSymbol, Color, Square } from 'chess.js';
 
+export const ARROW_COLOR_RED = 'rgba(239, 68, 68, 0.9)';
+export const ARROW_COLOR_GREEN = 'rgba(34, 197, 94, 0.9)';
+
 /**
  * Parsed components of a SAN move string
  */
