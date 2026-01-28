@@ -63,14 +63,14 @@ class PuzzleBackup:
                     id=p_data.get("id", ""),
                     fen=p_data.get("fen", ""),
                     moves=p_data.get("moves", ""),
-                    rating=p_data.get("rating", 1500),
-                    rating_deviation=p_data.get("rating_deviation", 350),
-                    popularity=p_data.get("popularity", 0),
-                    nb_plays=p_data.get("nb_plays", 0),
-                    themes=p_data.get("themes", ""),
-                    game_url=p_data.get("game_url", ""),
-                    opening_tags=p_data.get("opening_tags", ""),
-                    type=p_data.get("type", "unknown"),
+                    rating=p_data.get("rating") or 1500,
+                    rating_deviation=p_data.get("rating_deviation") or 350,
+                    popularity=p_data.get("popularity") or 0,
+                    nb_plays=p_data.get("nb_plays") or 0,
+                    themes=p_data.get("themes") or "",
+                    game_url=p_data.get("game_url") or "",
+                    opening_tags=p_data.get("opening_tags") or "",
+                    type=p_data.get("type") or "unknown",
                 )
             )
 

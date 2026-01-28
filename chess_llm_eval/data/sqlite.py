@@ -170,7 +170,7 @@ class SQLiteRepository:
         ]
         self.conn.executemany(
             """
-            INSERT OR IGNORE INTO puzzle
+            INSERT OR REPLACE INTO puzzle
             (id, fen, moves, rating, rating_deviation, popularity, nb_plays,
              themes, game_url, opening_tags, type)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
