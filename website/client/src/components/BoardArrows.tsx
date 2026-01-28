@@ -8,13 +8,10 @@ interface BoardArrowsProps {
 
 const VIEWBOX_SIZE = 2048;
 const BOARD_SIZE = 8;
-const ARROW_LENGTH_REDUCER_DENOMINATOR = 8;
-const SAME_TARGET_LENGTH_REDUCER_DENOMINATOR = 4;
 const ARROW_WIDTH_DENOMINATOR = 5;
 const ARROW_OPACITY = 0.65;
 const CORNER_RADIUS_DIVISOR = 8;
 const ARROW_BORDER_SCALE = 1.2;
-const ARROW_OFFSET_FACTOR = 0.5;
 const ARROW_HEAD_LENGTH_FACTOR = 1.2;
 const ARROW_HEAD_HALF_HEIGHT_FACTOR = 1.1;
 
@@ -36,36 +33,6 @@ const buildArrowHeadPoints = (strokeWidth: number) => {
   const baseX = 0;
   const halfH = ARROW_HEAD_HALF_HEIGHT_FACTOR * strokeWidth;
   return `${tipX},0 ${baseX},-${halfH} ${baseX},${halfH}`;
-};
-
-const getArrowOffset = (
-  arrows: Arrow[],
-  arrow: Arrow,
-  index: number,
-  from: { x: number; y: number },
-  to: { x: number; y: number },
-  strokeWidth: number
-) => {
-  const sharedStart = arrows
-    .map((other, idx) => ({ other, idx }))
-    .filter(({ other }) => other.startSquare === arrow.startSquare);
-
-  if (sharedStart.length <= 1) return { x: 0, y: 0 };
-
-  const groupIndex = sharedStart.findIndex(({ idx }) => idx === index);
-  const centerIndex = (sharedStart.length - 1) / 2;
-  const offsetAmount = (groupIndex - centerIndex) * strokeWidth * ARROW_OFFSET_FACTOR;
-
-  if (!offsetAmount) return { x: 0, y: 0 };
-
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy) || 1;
-
-  return {
-    x: (-dy / length) * offsetAmount,
-    y: (dx / length) * offsetAmount,
-  };
 };
 
 /**
@@ -101,7 +68,11 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
         const from = getSquareCenter(arrow.startSquare, orientation, squareWidth);
         const to = getSquareCenter(arrow.endSquare, orientation, squareWidth);
 
-        const offset = getArrowOffset(arrows, arrow, i, from, to, strokeWidth);
+        // Calculate offset to separate arrows with same start/end
+        // We set this to 0,0 to ensure arrows start/end at the exact center of tiles
+        // const offset = getArrowOffset(arrows, arrow, i, from, to, strokeWidth);
+        const offset = { x: 0, y: 0 };
+
         const fromWithOffset = { x: from.x + offset.x, y: from.y + offset.y };
         const toWithOffset = { x: to.x + offset.x, y: to.y + offset.y };
 
@@ -109,16 +80,8 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
         const dy = toWithOffset.y - fromWithOffset.y;
 
         const isStraight = dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy);
-        const sameTarget = arrows.some(
-          (other, idx) =>
-            idx !== i &&
-            other.startSquare !== arrow.startSquare &&
-            other.endSquare === arrow.endSquare
-        );
 
-        const lengthReducer =
-          squareWidth /
-          (sameTarget ? SAME_TARGET_LENGTH_REDUCER_DENOMINATOR : ARROW_LENGTH_REDUCER_DENOMINATOR);
+        const lengthReducer = ARROW_HEAD_LENGTH_FACTOR * strokeWidth;
 
         let pathD = '';
         let arrowAngleDeg = 0;
@@ -192,7 +155,7 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
                 stroke={borderColor}
                 strokeWidth={borderStrokeWidth}
                 fill="none"
-                strokeLinecap="butt"
+                strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeMiterlimit={2}
                 shapeRendering="geometricPrecision"
@@ -211,7 +174,7 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
                 stroke={arrow.color}
                 strokeWidth={strokeWidth}
                 fill="none"
-                strokeLinecap="butt"
+                strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeMiterlimit={2}
                 shapeRendering="geometricPrecision"
