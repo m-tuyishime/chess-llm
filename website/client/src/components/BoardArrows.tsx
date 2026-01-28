@@ -13,6 +13,10 @@ const SAME_TARGET_LENGTH_REDUCER_DENOMINATOR = 4;
 const ARROW_WIDTH_DENOMINATOR = 5;
 const ARROW_OPACITY = 0.65;
 const CORNER_RADIUS_DIVISOR = 8;
+const ARROW_BORDER_SCALE = 1.2;
+const ARROW_OFFSET_FACTOR = 0.5;
+const ARROW_HEAD_LENGTH_FACTOR = 1.2;
+const ARROW_HEAD_HALF_HEIGHT_FACTOR = 1.1;
 
 const getSquareCenter = (square: string, orientation: 'white' | 'black', squareWidth: number) => {
   const file = square.charCodeAt(0) - 97; // a=0, h=7
@@ -28,10 +32,40 @@ const getSquareCenter = (square: string, orientation: 'white' | 'black', squareW
 };
 
 const buildArrowHeadPoints = (strokeWidth: number) => {
-  const tipX = 0.75 * strokeWidth;
-  const baseX = -0.95 * strokeWidth;
-  const halfH = 1.25 * strokeWidth;
+  const tipX = ARROW_HEAD_LENGTH_FACTOR * strokeWidth;
+  const baseX = 0;
+  const halfH = ARROW_HEAD_HALF_HEIGHT_FACTOR * strokeWidth;
   return `${tipX},0 ${baseX},-${halfH} ${baseX},${halfH}`;
+};
+
+const getArrowOffset = (
+  arrows: Arrow[],
+  arrow: Arrow,
+  index: number,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  strokeWidth: number
+) => {
+  const sharedStart = arrows
+    .map((other, idx) => ({ other, idx }))
+    .filter(({ other }) => other.startSquare === arrow.startSquare);
+
+  if (sharedStart.length <= 1) return { x: 0, y: 0 };
+
+  const groupIndex = sharedStart.findIndex(({ idx }) => idx === index);
+  const centerIndex = (sharedStart.length - 1) / 2;
+  const offsetAmount = (groupIndex - centerIndex) * strokeWidth * ARROW_OFFSET_FACTOR;
+
+  if (!offsetAmount) return { x: 0, y: 0 };
+
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy) || 1;
+
+  return {
+    x: (-dy / length) * offsetAmount,
+    y: (dx / length) * offsetAmount,
+  };
 };
 
 /**
@@ -47,7 +81,7 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
 
   const squareWidth = VIEWBOX_SIZE / BOARD_SIZE;
   const strokeWidth = squareWidth / ARROW_WIDTH_DENOMINATOR;
-  const borderStrokeWidth = strokeWidth * 1.3;
+  const borderStrokeWidth = strokeWidth * ARROW_BORDER_SCALE;
   const cornerRadius = squareWidth / CORNER_RADIUS_DIVISOR;
 
   return (
@@ -60,15 +94,19 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: 20,
+        zIndex: 1,
       }}
     >
       {arrows.map((arrow, i) => {
         const from = getSquareCenter(arrow.startSquare, orientation, squareWidth);
         const to = getSquareCenter(arrow.endSquare, orientation, squareWidth);
 
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
+        const offset = getArrowOffset(arrows, arrow, i, from, to, strokeWidth);
+        const fromWithOffset = { x: from.x + offset.x, y: from.y + offset.y };
+        const toWithOffset = { x: to.x + offset.x, y: to.y + offset.y };
+
+        const dx = toWithOffset.x - fromWithOffset.x;
+        const dy = toWithOffset.y - fromWithOffset.y;
 
         const isStraight = dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy);
         const sameTarget = arrows.some(
@@ -84,13 +122,16 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
 
         let pathD = '';
         let arrowAngleDeg = 0;
-        let arrowEnd = to;
+        let arrowEnd = toWithOffset;
 
         if (!isStraight) {
-          const mid = Math.abs(dx) < Math.abs(dy) ? { x: from.x, y: to.y } : { x: to.x, y: from.y };
+          const mid =
+            Math.abs(dx) < Math.abs(dy)
+              ? { x: fromWithOffset.x, y: toWithOffset.y }
+              : { x: toWithOffset.x, y: fromWithOffset.y };
 
-          const dxEnd = to.x - mid.x;
-          const dyEnd = to.y - mid.y;
+          const dxEnd = toWithOffset.x - mid.x;
+          const dyEnd = toWithOffset.y - mid.y;
           const rEnd = Math.hypot(dxEnd, dyEnd);
 
           arrowEnd =
@@ -99,22 +140,22 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
                   x: mid.x + (dxEnd * (rEnd - lengthReducer)) / rEnd,
                   y: mid.y + (dyEnd * (rEnd - lengthReducer)) / rEnd,
                 }
-              : to;
+              : toWithOffset;
 
-          const seg1Len = Math.hypot(mid.x - from.x, mid.y - from.y) || 1;
+          const seg1Len = Math.hypot(mid.x - fromWithOffset.x, mid.y - fromWithOffset.y) || 1;
           const seg2Len = Math.hypot(arrowEnd.x - mid.x, arrowEnd.y - mid.y) || 1;
           const adjustedCornerRadius = Math.min(cornerRadius, seg1Len / 2, seg2Len / 2);
 
           const cornerStart = {
-            x: mid.x - ((mid.x - from.x) / seg1Len) * adjustedCornerRadius,
-            y: mid.y - ((mid.y - from.y) / seg1Len) * adjustedCornerRadius,
+            x: mid.x - ((mid.x - fromWithOffset.x) / seg1Len) * adjustedCornerRadius,
+            y: mid.y - ((mid.y - fromWithOffset.y) / seg1Len) * adjustedCornerRadius,
           };
           const cornerEnd = {
             x: mid.x + ((arrowEnd.x - mid.x) / seg2Len) * adjustedCornerRadius,
             y: mid.y + ((arrowEnd.y - mid.y) / seg2Len) * adjustedCornerRadius,
           };
 
-          pathD = `M ${from.x},${from.y} L ${cornerStart.x},${cornerStart.y} Q ${mid.x},${mid.y} ${cornerEnd.x},${cornerEnd.y} L ${arrowEnd.x},${arrowEnd.y}`;
+          pathD = `M ${fromWithOffset.x},${fromWithOffset.y} L ${cornerStart.x},${cornerStart.y} Q ${mid.x},${mid.y} ${cornerEnd.x},${cornerEnd.y} L ${arrowEnd.x},${arrowEnd.y}`;
 
           const angleRad = Math.atan2(arrowEnd.y - cornerEnd.y, arrowEnd.x - cornerEnd.x);
           arrowAngleDeg = (angleRad * 180) / Math.PI;
@@ -123,14 +164,14 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
           arrowEnd =
             r > lengthReducer
               ? {
-                  x: from.x + (dx * (r - lengthReducer)) / r,
-                  y: from.y + (dy * (r - lengthReducer)) / r,
+                  x: fromWithOffset.x + (dx * (r - lengthReducer)) / r,
+                  y: fromWithOffset.y + (dy * (r - lengthReducer)) / r,
                 }
-              : to;
+              : toWithOffset;
 
-          pathD = `M ${from.x},${from.y} L ${arrowEnd.x},${arrowEnd.y}`;
+          pathD = `M ${fromWithOffset.x},${fromWithOffset.y} L ${arrowEnd.x},${arrowEnd.y}`;
 
-          const angleRad = Math.atan2(arrowEnd.y - from.y, arrowEnd.x - from.x);
+          const angleRad = Math.atan2(arrowEnd.y - fromWithOffset.y, arrowEnd.x - fromWithOffset.x);
           arrowAngleDeg = (angleRad * 180) / Math.PI;
         }
 
@@ -146,18 +187,40 @@ export function BoardArrows({ arrows, orientation, agentColor }: BoardArrowsProp
             style={{ opacity: ARROW_OPACITY }}
           >
             <g>
-              <path d={pathD} stroke={borderColor} strokeWidth={borderStrokeWidth} fill="none" />
+              <path
+                d={pathD}
+                stroke={borderColor}
+                strokeWidth={borderStrokeWidth}
+                fill="none"
+                strokeLinecap="butt"
+                strokeLinejoin="round"
+                strokeMiterlimit={2}
+                shapeRendering="geometricPrecision"
+              />
               <polygon
                 points={borderArrowHeadPoints}
                 fill={borderColor}
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
                 transform={`translate(${arrowEnd.x}, ${arrowEnd.y}) rotate(${arrowAngleDeg})`}
               />
             </g>
             <g>
-              <path d={pathD} stroke={arrow.color} strokeWidth={strokeWidth} fill="none" />
+              <path
+                d={pathD}
+                stroke={arrow.color}
+                strokeWidth={strokeWidth}
+                fill="none"
+                strokeLinecap="butt"
+                strokeLinejoin="round"
+                strokeMiterlimit={2}
+                shapeRendering="geometricPrecision"
+              />
               <polygon
                 points={arrowHeadPoints}
                 fill={arrow.color}
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
                 transform={`translate(${arrowEnd.x}, ${arrowEnd.y}) rotate(${arrowAngleDeg})`}
               />
             </g>
