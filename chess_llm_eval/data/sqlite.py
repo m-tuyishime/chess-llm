@@ -2,6 +2,7 @@ import contextlib
 import logging
 import sqlite3
 from datetime import datetime
+from typing import Any
 
 import pandas as pd
 
@@ -123,9 +124,11 @@ class SQLiteRepository:
 
     def get_puzzles(self, limit: int | None = None) -> list[Puzzle]:
         query = "SELECT * FROM puzzle"
+        params = []
         if limit:
-            query += f" LIMIT {limit}"
-        cursor = self.conn.execute(query)
+            query += " LIMIT ?"
+            params.append(limit)
+        cursor = self.conn.execute(query, tuple(params))
         return [self._map_puzzle(row) for row in cursor.fetchall()]
 
     def get_puzzle(self, puzzle_id: str) -> Puzzle | None:
@@ -141,9 +144,11 @@ class SQLiteRepository:
             LEFT JOIN game g ON p.id = g.puzzle_id AND g.agent_name = ?
             WHERE g.id IS NULL
         """
+        params: list[Any] = [agent_name]
         if limit:
-            query += f" LIMIT {limit}"
-        cursor = self.conn.execute(query, (agent_name,))
+            query += " LIMIT ?"
+            params.append(limit)
+        cursor = self.conn.execute(query, tuple(params))
         return [self._map_puzzle(row) for row in cursor.fetchall()]
 
     def save_puzzles(self, puzzles: list[Puzzle]) -> None:
@@ -494,6 +499,7 @@ class SQLiteRepository:
                 b.agent_rating,
                 b.agent_deviation,
                 b.agent_volatility,
+                g.date,
                 ROW_NUMBER() OVER(PARTITION BY g.agent_name ORDER BY b.id) as evaluation_index
             FROM benchmark b
             LEFT JOIN game g ON g.id = b.game_id
@@ -599,7 +605,7 @@ class SQLiteRepository:
             SELECT g.agent_name, p.moves, group_concat(m.move, ' ') as agent_moves
             FROM game g
             JOIN puzzle p ON g.puzzle_id = p.id
-            LEFT JOIN move m ON m.game_id = g.id
+            LEFT JOIN (SELECT * FROM move ORDER BY id) m ON m.game_id = g.id
             WHERE m.illegal_move = 0
             GROUP BY g.id
         """
@@ -665,7 +671,7 @@ class SQLiteRepository:
                 group_concat(m.move, ' ') as agent_moves
             FROM game g
             JOIN puzzle p ON g.puzzle_id = p.id
-            LEFT JOIN move m ON m.game_id = g.id
+            LEFT JOIN (SELECT * FROM move ORDER BY id) m ON m.game_id = g.id
             WHERE m.illegal_move = 0
             GROUP BY g.id
         """

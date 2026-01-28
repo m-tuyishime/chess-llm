@@ -193,6 +193,7 @@ export function ReplayPage() {
             onClick={() => goToMove(-1)}
             disabled={currentMoveIndex === -1}
             className="btn-control"
+            aria-label="First Move"
           >
             <SkipBack size={24} />
           </button>
@@ -200,6 +201,7 @@ export function ReplayPage() {
             onClick={() => goToMove(currentMoveIndex - 1)}
             disabled={currentMoveIndex === -1}
             className="btn-control"
+            aria-label="Previous Move"
           >
             <ArrowLeft size={24} />
           </button>
@@ -213,6 +215,7 @@ export function ReplayPage() {
             onClick={() => goToMove(currentMoveIndex + 1)}
             disabled={currentMoveIndex >= game.moves.length - 1}
             className="btn-control"
+            aria-label="Next Move"
           >
             <ArrowRight size={24} />
           </button>
@@ -220,6 +223,7 @@ export function ReplayPage() {
             onClick={() => goToMove(game.moves.length - 1)}
             disabled={currentMoveIndex >= game.moves.length - 1}
             className="btn-control"
+            aria-label="Last Move"
           >
             <SkipForward size={24} />
           </button>
@@ -235,72 +239,33 @@ export function ReplayPage() {
         <div className="sidebar-inner-content">
           {/* Header */}
           <div className="sidebar-header-main">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                marginBottom: '1rem',
-              }}
-            >
+            <div className="sidebar-nav">
               <button
                 onClick={() =>
                   navigate(game?.agent_name ? `/agent/${game.agent_name}` : '/leaderboard')
                 }
-                className="btn-control"
-                style={{
-                  borderRadius: 'var(--radius-sm)',
-                  width: 'auto',
-                  padding: '0.25rem 0.5rem',
-                  fontSize: '0.875rem',
-                }}
+                className="btn-control btn-back-agent"
+                aria-label="Back to Agent"
               >
                 <ArrowLeft size={16} className="mr-2" /> Back to Agent
               </button>
-              <button onClick={() => setIsSidebarOpen(false)} className="btn-control">
+              <button
+                onClick={() => setIsSidebarOpen(false)}
+                className="btn-control"
+                aria-label="Close Sidebar"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div>
-              <h1 className="replay-title" style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>
-                {game.agent_name || 'Agent'} Replay
-              </h1>
-              <p
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.75rem',
-                  fontFamily: 'monospace',
-                  marginBottom: '0.5rem',
-                }}
-              >
+              <h1 className="replay-title sidebar-title">{game.agent_name || 'Agent'} Replay</h1>
+              <p className="sidebar-subtitle">
                 {new Date(game.date).toLocaleDateString()} • {game.failed ? 'Failed' : 'Solved'}
               </p>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.25rem 0.75rem',
-                  background: 'var(--bg-surface)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}
-              >
+              <div className="agent-badge">
                 <span>Playing as:</span>
-                <span
-                  style={{
-                    color: agentColor === 'white' ? '#1a1a1a' : '#ffffff',
-                    background: agentColor === 'white' ? '#ffffff' : '#1a1a1a',
-                    border: agentColor === 'white' ? '1px solid #e0e0e0' : '1px solid #333333',
-                    padding: '0.125rem 0.5rem',
-                    borderRadius: '4px',
-                    textTransform: 'capitalize',
-                  }}
-                >
-                  {agentColor}
-                </span>
+                <span className={`agent-badge-color ${agentColor}`}>{agentColor}</span>
               </div>
             </div>
           </div>
@@ -317,60 +282,30 @@ export function ReplayPage() {
             </div>
             <div style={{ padding: '1rem' }}>
               {puzzle && (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="puzzle-meta">
+                  <div className="puzzle-stat-row">
                     <div>
                       <div className="stat-label">Rating</div>
                       <div className="stat-value">{puzzle.rating}</div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
+                    <div className="puzzle-stat-right">
                       <div className="stat-label">Popularity</div>
                       <div className="stat-value">{puzzle.popularity}%</div>
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.5rem',
-                      background: 'var(--bg-app)',
-                      borderRadius: 'var(--radius-sm)',
-                    }}
-                  >
+                  <div className="puzzle-id-box">
                     <div>
-                      <div className="stat-label" style={{ marginBottom: '0.125rem' }}>
-                        Puzzle ID
-                      </div>
-                      <div
-                        className="stat-value"
-                        style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}
-                      >
-                        {puzzle.id}
-                      </div>
+                      <div className="stat-label stat-label-sm">Puzzle ID</div>
+                      <div className="stat-value puzzle-id-value">{puzzle.id}</div>
                     </div>
                     <a
                       href={`https://lichess.org/training/${puzzle.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-control"
-                      style={{
-                        width: 'auto',
-                        height: 'auto',
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.75rem',
-                        gap: '0.25rem',
-                        textDecoration: 'none',
-                      }}
+                      className="btn-control btn-open-lichess"
                       title="Open on Lichess"
+                      aria-label="Open on Lichess"
                     >
                       <ExternalLink size={14} />
                       Open

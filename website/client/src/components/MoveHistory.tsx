@@ -120,23 +120,31 @@ export function MoveHistory({
                   <td className="td-number">{row.number}.</td>
 
                   {/* White Move */}
-                  <td
-                    onClick={() => white && goToMove(white.index)}
-                    className={`history-cell ${white && currentMoveIndex === white.index ? 'active' : ''} ${white?.move.is_illegal ? 'illegal' : ''}`}
-                    style={{ cursor: white ? 'pointer' : 'default' }}
-                  >
-                    {white ? white.move.actual_move : ''}
-                    {white?.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                  <td className="history-cell">
+                    {white && (
+                      <button
+                        onClick={() => goToMove(white.index)}
+                        className={`history-btn ${currentMoveIndex === white.index ? 'active' : ''} ${white.move.is_illegal ? 'illegal' : ''}`}
+                        aria-label={`Go to move ${row.number} white ${white.move.actual_move}`}
+                      >
+                        {white.move.actual_move}
+                        {white.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                      </button>
+                    )}
                   </td>
 
                   {/* Black Move */}
-                  <td
-                    onClick={() => black && goToMove(black.index)}
-                    className={`history-cell ${black && currentMoveIndex === black.index ? 'active' : ''} ${black?.move.is_illegal ? 'illegal' : ''}`}
-                    style={{ cursor: black ? 'pointer' : 'default' }}
-                  >
-                    {black ? black.move.actual_move : ''}
-                    {black?.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                  <td className="history-cell">
+                    {black && (
+                      <button
+                        onClick={() => goToMove(black.index)}
+                        className={`history-btn ${currentMoveIndex === black.index ? 'active' : ''} ${black.move.is_illegal ? 'illegal' : ''}`}
+                        aria-label={`Go to move ${row.number} black ${black.move.actual_move}`}
+                      >
+                        {black.move.actual_move}
+                        {black.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

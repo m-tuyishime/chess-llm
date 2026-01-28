@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Chess, Square, PieceSymbol, Color } from 'chess.js';
 import { analyzeIllegalMove, IllegalMoveAnalysis } from '../lib/chess-logic';
 import { MoveRecordResponse } from '../api/types';
@@ -44,12 +44,32 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
   const [analysisResult, setAnalysisResult] = useState<IllegalMoveAnalysis | null>(null);
 
   // Computed Initial State
-  const getBaseChess = useCallback(() => {
+  const startFen = useMemo(() => {
     const c = new Chess();
     if (initialFen) c.load(initialFen);
     else c.reset();
-    return c;
+    return c.fen();
   }, [initialFen]);
+
+  // Pre-calculate FEN history for O(1) access
+  const fenCache = useMemo(() => {
+    const cache: string[] = [];
+    const tempChess = new Chess();
+    if (initialFen) tempChess.load(initialFen);
+    else tempChess.reset();
+
+    gameMoves.forEach((move) => {
+      if (move && !move.is_illegal && move.actual_move) {
+        try {
+          tempChess.move(move.actual_move);
+        } catch {
+          // Ignore invalid moves in history
+        }
+      }
+      cache.push(tempChess.fen());
+    });
+    return cache;
+  }, [gameMoves, initialFen]);
 
   // Update Arrows & Styles Logic
   const updateVisuals = useCallback(
@@ -64,19 +84,9 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       const newArrows: Arrow[] = [];
       const newCustomSquares: Record<string, React.CSSProperties> = {};
 
-      // Replay to current state
-      const tempChess = getBaseChess();
-      for (let i = 0; i < index; i++) {
-        const m = gameMoves[i];
-        if (m && !m.is_illegal && m.actual_move) {
-          try {
-            tempChess.move(m.actual_move);
-          } catch {
-            // Ignore invalid moves in history during fast replay
-          }
-        }
-      }
-      const currentFen = tempChess.fen();
+      // Get state BEFORE the move at index
+      const currentFen = index > 0 ? fenCache[index - 1] : startFen;
+      const tempChess = new Chess(currentFen);
       const currentTurn = tempChess.turn();
       const arrowBorderColor = currentTurn === 'w' ? 'white' : 'black';
 
@@ -129,7 +139,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
 
       setCustomSquareStyles(newCustomSquares);
     },
-    [gameMoves, getBaseChess, hallucinatedSquare, agentColor]
+    [gameMoves, fenCache, startFen, hallucinatedSquare, agentColor]
   );
 
   // Sync visuals when special states change
@@ -145,8 +155,7 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       setAnalysisResult(null);
 
       if (index === -1) {
-        const base = getBaseChess();
-        setBoardPosition(base.fen());
+        setBoardPosition(startFen);
         setCurrentMoveIndex(-1);
         setArrows([]);
         setCustomSquareStyles({});
@@ -154,20 +163,9 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
       }
 
       const moveRecord = gameMoves[index];
-      const tempChess = getBaseChess();
 
-      // Replay moves up to index
-      for (let i = 0; i < index; i++) {
-        const m = gameMoves[i];
-        if (m && !m.is_illegal && m.actual_move) {
-          try {
-            tempChess.move(m.actual_move);
-          } catch {
-            // Ignore
-          }
-        }
-      }
-      const baseFen = tempChess.fen(); // FEN before the current move
+      // Get state BEFORE the move at index
+      const baseFen = index > 0 ? fenCache[index - 1] : startFen;
 
       if (moveRecord?.is_illegal) {
         // Handle Illegal State
@@ -220,27 +218,20 @@ export function useChessReplay({ initialFen, gameMoves, agentColor }: UseChessRe
         if (moveRecord && moveRecord.fen) {
           setBoardPosition(moveRecord.fen);
         } else {
-          // Fallback simulation
-          try {
-            tempChess.move(moveRecord.actual_move);
-          } catch {
-            // Fallback move failed
-          }
-          setBoardPosition(tempChess.fen());
+          setBoardPosition(fenCache[index]);
         }
       }
 
       setCurrentMoveIndex(index);
     },
-    [gameMoves, getBaseChess, agentColor]
+    [gameMoves, fenCache, startFen, agentColor]
   );
 
   // Initialize board on load
   useEffect(() => {
-    const base = getBaseChess();
-    setBoardPosition(base.fen());
+    setBoardPosition(startFen);
     setCurrentMoveIndex(-1);
-  }, [getBaseChess]);
+  }, [startFen]);
 
   return {
     chess,
