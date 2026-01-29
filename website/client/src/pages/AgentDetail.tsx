@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { AgentDetailResponse } from '../api/types';
 import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } from 'lucide-react';
@@ -9,7 +9,9 @@ import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } f
  * Displays statistics and game history for a specific agent.
  */
 export function AgentDetail() {
-  const { name } = useParams<{ name: string }>();
+  const params = useParams();
+  const name = params['*'];
+  const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -235,7 +237,11 @@ export function AgentDetail() {
             <tbody>
               {currentGames.length > 0 ? (
                 currentGames.map((game, i) => (
-                  <tr key={game.id || i} className="game-row">
+                  <tr
+                    key={game.id || i}
+                    className="game-row cursor-pointer hover:bg-slate-800/50 transition-colors"
+                    onClick={() => navigate(`/replay/${game.id}`)}
+                  >
                     <td>
                       {game.failed ? (
                         <span className="status-badge status-failed">
@@ -264,12 +270,12 @@ export function AgentDetail() {
                       <span className="type-badge">{game.puzzle_type}</span>
                     </td>
                     <td className="puzzle-id">{game.puzzle_id}</td>
-                    <td className="moves-cell">{game.moves.length}</td>
+                    <td className="moves-cell">{game.move_count}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     <Hash className="empty-icon" />
                     <p>No games found matching filter.</p>
                   </td>

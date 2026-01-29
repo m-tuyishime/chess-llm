@@ -37,6 +37,16 @@ export interface GameResponse {
   date: string; // ISO 8601 string
 }
 
+export interface GameSummaryResponse {
+  id: number | null;
+  puzzle_id: string;
+  puzzle_type: string;
+  agent_name: string;
+  failed: boolean;
+  move_count: number;
+  date: string;
+}
+
 export interface AgentRankingResponse {
   name: string;
   rating: number;
@@ -52,5 +62,5 @@ export interface AgentDetailResponse {
   rating: number;
   rd: number;
   volatility: number;
-  games: GameResponse[];
+  games: GameSummaryResponse[];
 }

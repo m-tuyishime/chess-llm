@@ -21,12 +21,12 @@ class PuzzleResponse(BaseSchema):
     moves: str
     rating: int
     rating_deviation: int
-    themes: str
+    themes: str | None = None
     type: str
     popularity: int
     nb_plays: int
-    game_url: str
-    opening_tags: str
+    game_url: str | None = None
+    opening_tags: str | None = None
 
 
 class MoveRecordResponse(BaseSchema):
@@ -50,6 +50,16 @@ class GameResponse(BaseSchema):
     date: datetime
 
 
+class GameSummaryResponse(BaseSchema):
+    id: int | None
+    puzzle_id: str
+    puzzle_type: str
+    agent_name: str
+    failed: bool
+    move_count: int
+    date: datetime
+
+
 class AgentRankingResponse(BaseSchema):
     name: str
     rating: float
@@ -65,4 +75,4 @@ class AgentDetailResponse(BaseSchema):
     rating: float
     rd: float
     volatility: float
-    games: list[GameResponse] = Field(default_factory=list)
+    games: list[GameSummaryResponse] = Field(default_factory=list)

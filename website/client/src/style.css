@@ -5,7 +5,9 @@
 }
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
   /* =========================================
      Theme: Premium Dark (Default)
@@ -123,7 +125,9 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-app);
   color: var(--text-primary);
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -132,6 +136,14 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-md);
+}
+
+#app.full-screen-layout {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Typography */
@@ -161,7 +173,9 @@ h1 {
   padding: var(--spacing-md);
   box-shadow: var(--shadow-card);
   border: 1px solid var(--border-subtle);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .card:hover {
@@ -828,14 +842,13 @@ h1 {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
   }
 
   50% {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 
@@ -889,7 +902,7 @@ h1 {
   background: linear-gradient(135deg, #eecda3 0%, #ef629f 100%);
   /* Bronze-ish / Copper */
   /* Better bronze gradient */
-  background: linear-gradient(135deg, #FFDBB5 0%, #D4A373 100%);
+  background: linear-gradient(135deg, #ffdbb5 0%, #d4a373 100%);
   color: #431407;
   box-shadow: 0 0 15px rgba(212, 163, 115, 0.4);
   border-color: rgba(212, 163, 115, 0.5);
@@ -922,5 +935,16 @@ h1 {
 
   .agent-name {
     font-size: 2rem;
+  }
+}
+
+@keyframes blink-opacity {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
   }
 }

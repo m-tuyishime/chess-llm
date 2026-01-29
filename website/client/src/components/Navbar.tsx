@@ -37,17 +37,19 @@ export function Navbar() {
   return (
     <nav className="navbar">
       <div className="logo">
-        <span
-          style={{
-            fontWeight: 800,
-            fontSize: '1.5rem',
-            background: 'var(--accent-gradient)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          Chess LLM Arena
-        </span>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <span
+            style={{
+              fontWeight: 800,
+              fontSize: '1.5rem',
+              background: 'var(--accent-gradient)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Chess LLM Arena
+          </span>
+        </Link>
       </div>
       <div className="nav-links">
         <Link
