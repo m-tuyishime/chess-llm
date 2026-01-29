@@ -35,7 +35,7 @@ export function About() {
             className="btn btn-primary"
             style={{ textDecoration: 'none' }}
           >
-            📄 Read Full Report (PDF)
+            📄 Read Full Report (French only)
           </a>
         </div>
       </section>
