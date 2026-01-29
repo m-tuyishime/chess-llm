@@ -6,18 +6,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from chess_llm_eval.data.protocols import GameRepository
 from chess_llm_eval.schemas import (
     AgentDetailResponse,
+    AgentPuzzleOutcomeResponse,
     AgentRankingResponse,
+    AnalyticsResponse,
+    BenchmarkDataResponse,
     GameResponse,
     GameSummaryResponse,
     HealthResponse,
+    IllegalMoveResponse,
+    PuzzleOutcomeResponse,
     PuzzleResponse,
+    TokenUsageResponse,
 )
 from website.server.dependencies import get_repository
 
 app = FastAPI(title="Chess-LLM Arena API")
 
 # Configure CORS for portfolio subdomain (and local dev)
-# TODO: Move to config
 origins = [
     "http://localhost:5173",  # Vite default
     "http://localhost:5174",
@@ -27,7 +32,6 @@ origins = [
     "http://127.0.0.1:5174",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:4000",
-    # Add production domain later
 ]
 
 app.add_middleware(
@@ -53,6 +57,75 @@ async def get_leaderboard(
     return [AgentRankingResponse.model_validate(r) for r in repository.get_leaderboard()]
 
 
+@app.get("/api/analytics", response_model=AnalyticsResponse)
+async def get_analytics(
+    repository: Annotated[GameRepository, Depends(get_repository)],
+) -> AnalyticsResponse:
+    """Get aggregate analytics for all agents."""
+    # Benchmarks
+    bench_df = repository.get_benchmark_data()
+    rating_trends = (
+        [BenchmarkDataResponse.model_validate(row) for _, row in bench_df.iterrows()]
+        if not bench_df.empty
+        else []
+    )
+
+    # Puzzle outcomes
+    outcome_df = repository.get_puzzle_outcome_data()
+    puzzle_outcomes = (
+        [PuzzleOutcomeResponse.model_validate(row) for _, row in outcome_df.iterrows()]
+        if not outcome_df.empty
+        else []
+    )
+
+    # Illegal moves
+    illegal_df = repository.get_illegal_moves_data()
+    if not illegal_df.empty:
+        illegal_df["illegal_percentage"] = (
+            illegal_df["illegal_moves_count"] / illegal_df["total_moves"]
+        ) * 100
+        illegal_moves = [
+            IllegalMoveResponse.model_validate(row) for _, row in illegal_df.iterrows()
+        ]
+    else:
+        illegal_moves = []
+
+    # Token usage
+    token_df = repository.get_token_usage_per_puzzle_data()
+    token_usage = (
+        [
+            TokenUsageResponse(
+                agent_name=row["agent_name"],
+                avg_prompt_tokens=row["avg_puzzle_prompt_tokens"],
+                avg_completion_tokens=row["avg_puzzle_completion_tokens"],
+            )
+            for _, row in token_df.iterrows()
+        ]
+        if not token_df.empty
+        else []
+    )
+
+    return AnalyticsResponse(
+        rating_trends=rating_trends,
+        puzzle_outcomes=puzzle_outcomes,
+        illegal_moves=illegal_moves,
+        token_usage=token_usage,
+    )
+
+
+@app.get("/api/analytics/agents/{name:path}", response_model=list[AgentPuzzleOutcomeResponse])
+async def get_agent_analytics(
+    name: str, repository: Annotated[GameRepository, Depends(get_repository)]
+) -> list[AgentPuzzleOutcomeResponse]:
+    """Get detailed analytics for a specific agent."""
+    df = repository.get_puzzle_outcomes_by_agent_data()
+    if df.empty:
+        return []
+
+    agent_df = df[df["agent_name"] == name]
+    return [AgentPuzzleOutcomeResponse.model_validate(row) for _, row in agent_df.iterrows()]
+
+
 @app.get("/api/agents/{name:path}", response_model=AgentDetailResponse)
 async def get_agent_detail(
     name: str, repository: Annotated[GameRepository, Depends(get_repository)]
@@ -64,7 +137,6 @@ async def get_agent_detail(
 
     games = repository.get_agent_games(name)
 
-    # We construct the response explicitly because AgentData doesn't have 'games'
     return AgentDetailResponse(
         name=agent.name,
         is_reasoning=agent.is_reasoning,
@@ -91,10 +163,7 @@ async def get_agent_detail(
 async def get_game(
     idstr: str, repository: Annotated[GameRepository, Depends(get_repository)]
 ) -> GameResponse:
-    """
-    Get a game's details by ID.
-    Note: ID is int in DB but potentially passed as string.
-    """
+    """Get a game's details by ID."""
     try:
         game_id = int(idstr)
     except ValueError:

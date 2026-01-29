@@ -64,3 +64,45 @@ export interface AgentDetailResponse {
   volatility: number;
   games: GameSummaryResponse[];
 }
+
+export interface BenchmarkDataResponse {
+  agent_name: string;
+  agent_rating: number;
+  agent_deviation: number;
+  agent_volatility: number;
+  date: string;
+  evaluation_index: number;
+}
+
+export interface PuzzleOutcomeResponse {
+  type: string;
+  successes: number;
+  failures: number;
+}
+
+export interface AgentPuzzleOutcomeResponse {
+  agent_name: string;
+  type: string;
+  successes: number;
+  failures: number;
+}
+
+export interface IllegalMoveResponse {
+  agent_name: string;
+  total_moves: number;
+  illegal_moves_count: number;
+  illegal_percentage: number;
+}
+
+export interface TokenUsageResponse {
+  agent_name: string;
+  avg_prompt_tokens: number;
+  avg_completion_tokens: number;
+}
+
+export interface AnalyticsResponse {
+  rating_trends: BenchmarkDataResponse[];
+  puzzle_outcomes: PuzzleOutcomeResponse[];
+  illegal_moves: IllegalMoveResponse[];
+  token_usage: TokenUsageResponse[];
+}

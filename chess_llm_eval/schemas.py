@@ -76,3 +76,52 @@ class AgentDetailResponse(BaseSchema):
     rd: float
     volatility: float
     games: list[GameSummaryResponse] = Field(default_factory=list)
+
+
+class BenchmarkDataResponse(BaseSchema):
+    agent_name: str
+    agent_rating: float
+    agent_deviation: float
+    agent_volatility: float
+    date: datetime
+    evaluation_index: int
+
+
+class PuzzleOutcomeResponse(BaseSchema):
+    type: str
+    successes: int
+    failures: int
+
+
+class AgentPuzzleOutcomeResponse(BaseSchema):
+    agent_name: str
+    type: str
+    successes: int
+    failures: int
+
+
+class IllegalMoveResponse(BaseSchema):
+    agent_name: str
+    total_moves: int
+    illegal_moves_count: int
+    illegal_percentage: float
+
+
+class TokenUsageResponse(BaseSchema):
+    agent_name: str
+    avg_prompt_tokens: float
+    avg_completion_tokens: float
+
+
+class RatingIntervalResponse(BaseSchema):
+    agent_name: str
+    agent_rating: float
+    agent_deviation: float
+    error: float
+
+
+class AnalyticsResponse(BaseSchema):
+    rating_trends: list[BenchmarkDataResponse]
+    puzzle_outcomes: list[PuzzleOutcomeResponse]
+    illegal_moves: list[IllegalMoveResponse]
+    token_usage: list[TokenUsageResponse]
