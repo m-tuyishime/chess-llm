@@ -36,7 +36,7 @@ function AppLayout() {
             paddingBottom: '2rem',
           }}
         >
-          &copy; 2025 Chess LLM Arena. All rights reserved.
+          Chess LLM Arena
         </footer>
       )}
     </div>

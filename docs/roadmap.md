@@ -157,6 +157,12 @@
   - [x] Puzzle Outcomes by Type
 
 
+### 3.8 Internationalization (New)
+
+- [ ] Implement EN/FR language toggle
+- [ ] Multi-language support for all pages
+- [ ] Persistent language preference in local storage
+
 **Week 3 Deliverable**: Complete SPA with all 4 pages functional
 
 ---
