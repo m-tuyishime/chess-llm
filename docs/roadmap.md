@@ -133,18 +133,18 @@
 
 ### 3.5 Puzzle Replay Page (`/replay/:gameId`)
 
-- [ ] Integrate chess board library (chessground or chessboardjs)
-- [ ] Step through moves with keyboard/buttons
-- [ ] Highlight expected vs actual moves
-- [ ] Show illegal move attempts
-- [ ] Display puzzle metadata sidebar
+- [x] Integrate chess board library (chessground or chessboardjs)
+- [x] Step through moves with keyboard/buttons
+- [x] Highlight expected vs actual moves
+- [x] Show illegal move attempts
+- [x] Display puzzle metadata sidebar
 
 ### 3.6 About Page (`/about`)
 
-- [ ] Research abstract (from report.pdf)
-- [ ] Methodology explanation
-- [ ] Link to full paper PDF
-- [ ] Author credits
+- [x] Research abstract (from report.pdf)
+- [x] Methodology explanation
+- [x] Link to full paper PDF
+- [x] Author credits
 
 ### 3.7 Analytics & Comparison (New)
 
@@ -155,6 +155,12 @@
   - Rating Deviation Trends
   - Percentage of Illegal Moves
   - Puzzle Outcomes by Type
+
+### 3.8 Internationalization (New)
+
+- [ ] Implement EN/FR language toggle
+- [ ] Multi-language support for all pages
+- [ ] Persistent language preference in local storage
 
 **Week 3 Deliverable**: Complete SPA with all 4 pages functional
 
