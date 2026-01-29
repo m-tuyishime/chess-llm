@@ -58,6 +58,12 @@ export function Navbar() {
         >
           Leaderboard
         </Link>
+        <Link
+          to="/analytics"
+          className={`nav-link ${location.pathname === '/analytics' ? 'active' : ''}`}
+        >
+          Analytics
+        </Link>
         <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
           About
         </Link>
