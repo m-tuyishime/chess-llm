@@ -133,11 +133,11 @@
 
 ### 3.5 Puzzle Replay Page (`/replay/:gameId`)
 
-- [ ] Integrate chess board library (chessground or chessboardjs)
-- [ ] Step through moves with keyboard/buttons
-- [ ] Highlight expected vs actual moves
-- [ ] Show illegal move attempts
-- [ ] Display puzzle metadata sidebar
+- [x] Integrate chess board library (chessground or chessboardjs)
+- [x] Step through moves with keyboard/buttons
+- [x] Highlight expected vs actual moves
+- [x] Show illegal move attempts
+- [x] Display puzzle metadata sidebar
 
 ### 3.6 About Page (`/about`)
 
