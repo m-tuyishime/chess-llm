@@ -141,10 +141,10 @@
 
 ### 3.6 About Page (`/about`)
 
-- [ ] Research abstract (from report.pdf)
-- [ ] Methodology explanation
-- [ ] Link to full paper PDF
-- [ ] Author credits
+- [x] Research abstract (from report.pdf)
+- [x] Methodology explanation
+- [x] Link to full paper PDF
+- [x] Author credits
 
 ### 3.7 Analytics & Comparison (New)
 
