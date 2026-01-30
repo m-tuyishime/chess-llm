@@ -100,6 +100,27 @@ class MockRepository(GameRepository):
     def get_puzzle(self, puzzle_id: str) -> Puzzle | None:
         return None
 
+    def get_benchmark_data(self) -> Any:
+        return None
+
+    def get_puzzle_outcome_data(self) -> Any:
+        return None
+
+    def get_puzzle_outcomes_by_agent_data(self) -> Any:
+        return None
+
+    def get_illegal_moves_data(self) -> Any:
+        return None
+
+    def get_token_usage_per_puzzle_data(self) -> Any:
+        return None
+
+    def get_final_ratings_data(self) -> Any:
+        return None
+
+    def get_weighted_puzzle_rating(self) -> tuple[float | None, float | None]:
+        return None, None
+
 
 @pytest.fixture
 def mock_repo() -> MockRepository:

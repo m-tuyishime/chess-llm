@@ -148,13 +148,20 @@
 
 ### 3.7 Analytics & Comparison (New)
 
-- [ ] Interactive charts for model rating trends (Line Chart)
-- [ ] Model performance comparison tool (win rates, puzzle type analysis)
-- [ ] Visualizations based on reports:
-  - Model Rating Trends
-  - Rating Deviation Trends
-  - Percentage of Illegal Moves
-  - Puzzle Outcomes by Type
+- [x] Interactive charts for model rating trends (Line Chart)
+- [x] Model performance comparison tool (win rates, puzzle type analysis)
+- [x] Visualizations based on reports:
+  - [x] Model Rating Trends
+  - [x] Rating Deviation Trends
+  - [x] Percentage of Illegal Moves
+  - [x] Puzzle Outcomes by Type
+
+
+### 3.8 Internationalization (New)
+
+- [ ] Implement EN/FR language toggle
+- [ ] Multi-language support for all pages
+- [ ] Persistent language preference in local storage
 
 **Week 3 Deliverable**: Complete SPA with all 4 pages functional
 

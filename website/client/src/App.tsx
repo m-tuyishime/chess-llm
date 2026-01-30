@@ -4,6 +4,7 @@ import { Leaderboard } from './pages/Leaderboard';
 import { AgentDetail } from './pages/AgentDetail';
 import { ReplayPage } from './pages/ReplayPage';
 import { About } from './pages/About';
+import { Analytics } from './pages/Analytics';
 
 /**
  * Layout wrapper to handle conditional rendering of Navbar and Footer.
@@ -22,6 +23,7 @@ function AppLayout() {
           <Route path="/agent/*" element={<AgentDetail />} />
           <Route path="/replay/:gameId" element={<ReplayPage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </main>
       {!isReplayPage && (
@@ -34,7 +36,7 @@ function AppLayout() {
             paddingBottom: '2rem',
           }}
         >
-          &copy; 2025 Chess LLM Arena. All rights reserved.
+          Chess LLM Arena
         </footer>
       )}
     </div>
