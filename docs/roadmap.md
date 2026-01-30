@@ -159,7 +159,7 @@
 
 ### 3.8 Internationalization (New)
 
-- [ ] Implement EN/FR language toggle
+- [/] Implement EN/FR language toggle
 - [ ] Multi-language support for all pages
 - [ ] Persistent language preference in local storage
 
