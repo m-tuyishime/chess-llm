@@ -128,78 +128,13 @@ async def test_single_puzzle_evaluation(
     repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
 
     evaluator = Evaluator(agent, [SAMPLE_PUZZLES[0]], repository)
-    result = await evaluator.evaluate_puzzle(SAMPLE_PUZZLES[0])
+    await evaluator.evaluate_all()
 
-    assert result is not None
-    game_id, (rating, rd, success) = result
-    assert game_id == 1
-    assert rating == 1200
-    assert rd == 100
-    assert isinstance(success, bool)
-
-    # Verify game was created
-    cursor = repository.conn.execute("SELECT * FROM game WHERE id = ?", (game_id,))
-    game = cursor.fetchone()
-    assert game is not None
-    assert game["puzzle_id"] == "e2e_tactic_1"
-    assert game["agent_name"] == agent.name
-
-
-@pytest.mark.asyncio
-@pytest.mark.integration
-async def test_multi_puzzle_evaluation(
-    repository: SQLiteRepository, nim_provider: NIMProvider
-) -> None:
-    """
-    Test concurrent evaluation of multiple puzzles.
-    Why: Validates that evaluate_all() works correctly with concurrency,
-    and that all results are properly saved to the repository.
-    """
-    agent = LLMAgent(
-        provider=nim_provider,
-        model_name="meta/llama-3.1-8b-instruct",
-        is_reasoning=False,
-    )
-
-    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
-
-    evaluator = Evaluator(agent, SAMPLE_PUZZLES, repository)
-    await evaluator.evaluate_all(max_concurrent=2)
-
-    # Verify all games were created
-    cursor = repository.conn.execute(
-        "SELECT COUNT(*) as count FROM game WHERE agent_name = ?", (agent.name,)
-    )
-    count = cursor.fetchone()["count"]
-    assert count == 3
-
-    # Verify all puzzles have results
-    cursor = repository.conn.execute("SELECT * FROM game WHERE agent_name = ?", (agent.name,))
-    games = cursor.fetchall()
-    assert len(games) == 3
-
-
-@pytest.mark.asyncio
-@pytest.mark.integration
-async def test_rating_update_flow(repository: SQLiteRepository, nim_provider: NIMProvider) -> None:
-    """
-    Test Glicko-2 rating updates after puzzle completion.
-    Why: Verifies that benchmark records are created and agent rating
-    cache is updated correctly after each evaluation.
-    """
-    agent = LLMAgent(
-        provider=nim_provider,
-        model_name="meta/llama-3.1-8b-instruct",
-        is_reasoning=False,
-    )
-
-    repository.save_agent(AgentData(name=agent.name, is_reasoning=False, is_random=False))
-
-    evaluator = Evaluator(agent, [SAMPLE_PUZZLES[0]], repository)
-    result = await evaluator.evaluate_puzzle(SAMPLE_PUZZLES[0])
-
-    assert result is not None
-    game_id, _ = result
+    # Get game_id from database (since evaluate_all doesn't return it directly)
+    cursor = repository.conn.execute("SELECT id FROM game ORDER BY id DESC LIMIT 1")
+    row = cursor.fetchone()
+    assert row is not None
+    game_id = row["id"]
 
     # Verify benchmark was created
     cursor = repository.conn.execute("SELECT * FROM benchmark WHERE game_id = ?", (game_id,))

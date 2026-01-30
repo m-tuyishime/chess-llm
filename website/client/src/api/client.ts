@@ -1,6 +1,8 @@
 import {
   AgentDetailResponse,
+  AgentPuzzleOutcomeResponse,
   AgentRankingResponse,
+  AnalyticsResponse,
   GameResponse,
   HealthResponse,
   PuzzleResponse,
@@ -49,4 +51,7 @@ export const api = {
     request<AgentDetailResponse>(`/api/agents/${encodeURIComponent(name)}`),
   getGame: (id: string) => request<GameResponse>(`/api/games/${id}`),
   getPuzzle: (id: string) => request<PuzzleResponse>(`/api/puzzles/${id}`),
+  getAnalytics: () => request<AnalyticsResponse>('/api/analytics'),
+  getAgentAnalytics: (name: string) =>
+    request<AgentPuzzleOutcomeResponse[]>(`/api/analytics/agents/${encodeURIComponent(name)}`),
 };

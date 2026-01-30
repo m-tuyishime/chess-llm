@@ -1,8 +1,27 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
-import { AgentDetailResponse } from '../api/types';
-import { Trophy, Activity, Hash, Check, X, ArrowLeft, Gamepad2, Brain, Dice5 } from 'lucide-react';
+import {
+  AgentDetailResponse,
+  AgentPuzzleOutcomeResponse,
+  BenchmarkDataResponse,
+} from '../api/types';
+import {
+  Trophy,
+  Activity,
+  Hash,
+  Check,
+  X,
+  ArrowLeft,
+  Gamepad2,
+  Brain,
+  Dice5,
+  PieChart,
+  TrendingUp,
+} from 'lucide-react';
+import { ChartCard } from '../components/ChartCard';
+import { PuzzleOutcomesChart } from '../components/charts/PuzzleOutcomesChart';
+import { RatingTrendsChart } from '../components/charts/RatingTrendsChart';
 
 /**
  * Agent Detail Page component.
@@ -13,6 +32,8 @@ export function AgentDetail() {
   const name = params['*'];
   const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentDetailResponse | null>(null);
+  const [agentAnalytics, setAgentAnalytics] = useState<AgentPuzzleOutcomeResponse[]>([]);
+  const [ratingHistory, setRatingHistory] = useState<BenchmarkDataResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,18 +44,26 @@ export function AgentDetail() {
   const pageSize = 15;
 
   useEffect(() => {
-    const fetchAgent = async () => {
-      // ... existing fetch logic ...
+    const fetchData = async () => {
       if (!name) return;
       try {
         setLoading(true);
-        // Start measuring time
-        const start = performance.now();
-        const data = await api.getAgentDetail(name);
-        const end = performance.now();
-        console.log(`Fetch took ${Math.round(end - start)}ms`);
 
-        setAgent(data);
+        // Fetch agent detail, agent-specific analytics, and global analytics for trends
+        const [agentData, analyticsData, globalAnalytics] = await Promise.all([
+          api.getAgentDetail(name),
+          api.getAgentAnalytics(name),
+          api.getAnalytics(),
+        ]);
+
+        setAgent(agentData);
+        setAgentAnalytics(analyticsData);
+
+        // Filter global rating trends for this specific agent
+        const filteredTrends = globalAnalytics.rating_trends.filter(
+          (trend) => trend.agent_name.toLowerCase() === name.toLowerCase()
+        );
+        setRatingHistory(filteredTrends);
       } catch (err) {
         setError('Failed to fetch agent details');
         console.error(err);
@@ -43,7 +72,7 @@ export function AgentDetail() {
       }
     };
 
-    fetchAgent();
+    fetchData();
   }, [name]);
 
   // Derived state for filtered games
@@ -175,7 +204,42 @@ export function AgentDetail() {
         />
       </div>
 
+      {/* Performance Charts */}
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '2rem',
+          marginBottom: '2rem',
+        }}
+      >
+        <ChartCard
+          title="Puzzle Success by Type"
+          description="Performance breakdown across different tactical themes"
+          icon={<PieChart size={20} />}
+        >
+          <PuzzleOutcomesChart
+            data={agentAnalytics.map((d) => ({
+              type: d.type,
+              successes: d.successes,
+              failures: d.failures,
+            }))}
+          />
+        </ChartCard>
+
+        {ratingHistory.length > 0 && (
+          <ChartCard
+            title="Rating History"
+            description="Progression of Glicko-2 rating over time"
+            icon={<TrendingUp size={20} />}
+          >
+            <RatingTrendsChart data={ratingHistory} />
+          </ChartCard>
+        )}
+      </div>
+
       {/* Games Section */}
+
       <div className="card games-section">
         <div className="games-header">
           <div className="games-title-group">
