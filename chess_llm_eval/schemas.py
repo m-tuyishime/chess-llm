@@ -125,3 +125,6 @@ class AnalyticsResponse(BaseSchema):
     puzzle_outcomes: list[PuzzleOutcomeResponse]
     illegal_moves: list[IllegalMoveResponse]
     token_usage: list[TokenUsageResponse]
+    final_ratings: list[RatingIntervalResponse]
+    weighted_puzzle_rating: float | None = None
+    weighted_puzzle_deviation: float | None = None

@@ -16,6 +16,7 @@ from chess_llm_eval.schemas import (
     IllegalMoveResponse,
     PuzzleOutcomeResponse,
     PuzzleResponse,
+    RatingIntervalResponse,
     TokenUsageResponse,
 )
 from website.server.dependencies import get_repository
@@ -105,11 +106,32 @@ async def get_analytics(
         else []
     )
 
+    # Final ratings and intervals
+    final_ratings_df = repository.get_final_ratings_data()
+    final_ratings = (
+        [
+            RatingIntervalResponse(
+                agent_name=row["agent_name"],
+                agent_rating=row["agent_rating"],
+                agent_deviation=row["agent_deviation"],
+                error=row["agent_deviation"] * 2,
+            )
+            for _, row in final_ratings_df.iterrows()
+        ]
+        if not final_ratings_df.empty
+        else []
+    )
+
+    weighted_rating, weighted_rd = repository.get_weighted_puzzle_rating()
+
     return AnalyticsResponse(
         rating_trends=rating_trends,
         puzzle_outcomes=puzzle_outcomes,
         illegal_moves=illegal_moves,
         token_usage=token_usage,
+        final_ratings=final_ratings,
+        weighted_puzzle_rating=weighted_rating,
+        weighted_puzzle_deviation=weighted_rd,
     )
 
 

@@ -100,9 +100,19 @@ export interface TokenUsageResponse {
   avg_completion_tokens: number;
 }
 
+export interface RatingIntervalResponse {
+  agent_name: string;
+  agent_rating: number;
+  agent_deviation: number;
+  error: number;
+}
+
 export interface AnalyticsResponse {
   rating_trends: BenchmarkDataResponse[];
   puzzle_outcomes: PuzzleOutcomeResponse[];
   illegal_moves: IllegalMoveResponse[];
   token_usage: TokenUsageResponse[];
+  final_ratings: RatingIntervalResponse[];
+  weighted_puzzle_rating: number | null;
+  weighted_puzzle_deviation: number | null;
 }

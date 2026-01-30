@@ -5,6 +5,7 @@ interface ChartCardProps {
   description?: string;
   children: React.ReactNode;
   icon?: React.ReactNode;
+  minHeight?: string;
 }
 
 /**
@@ -15,8 +16,15 @@ interface ChartCardProps {
  * @param props.description - Optional description
  * @param props.children - The chart content
  * @param props.icon - Optional icon
+ * @param props.minHeight - Minimum height for the chart container
  */
-export function ChartCard({ title, description, children, icon }: ChartCardProps) {
+export function ChartCard({
+  title,
+  description,
+  children,
+  icon,
+  minHeight = '300px',
+}: ChartCardProps) {
   return (
     <div
       className="card animate-fade-in"
@@ -41,7 +49,7 @@ export function ChartCard({ title, description, children, icon }: ChartCardProps
           </div>
         </div>
       </div>
-      <div style={{ flex: 1, minHeight: '300px', position: 'relative' }}>{children}</div>
+      <div style={{ flex: 1, minHeight, position: 'relative' }}>{children}</div>
     </div>
   );
 }

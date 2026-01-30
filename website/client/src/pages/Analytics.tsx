@@ -3,10 +3,13 @@ import { api } from '../api/client';
 import { AnalyticsResponse } from '../api/types';
 import { ChartCard } from '../components/ChartCard';
 import { RatingTrendsChart } from '../components/charts/RatingTrendsChart';
+import { RatingDeviationChart } from '../components/charts/RatingDeviationChart';
+import { FinalRatingsIntervalsChart } from '../components/charts/FinalRatingsIntervalsChart';
 import { IllegalMovesChart } from '../components/charts/IllegalMovesChart';
+
 import { PuzzleOutcomesChart } from '../components/charts/PuzzleOutcomesChart';
 import { TokenUsageChart } from '../components/charts/TokenUsageChart';
-import { AlertTriangle, PieChart, Zap, TrendingUp } from 'lucide-react';
+import { AlertTriangle, PieChart, Zap, TrendingUp, Activity, Target } from 'lucide-react';
 
 /**
  * Analytics page component.
@@ -64,24 +67,25 @@ export function Analytics() {
   }
 
   return (
-    <div className="container animate-fade-in">
-      <header style={{ marginBottom: '2rem' }}>
-        <h1>Analytics & Comparison</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          Detailed performance metrics and rating trends for all agents.
-        </p>
-      </header>
-
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' }}
-      >
+    <div
+      className="container animate-fade-in"
+      style={{ paddingTop: '2rem', paddingBottom: '5rem' }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
         <ChartCard
           title="Model Rating Trends"
           description="Glicko-2 rating evolution across evaluation periods"
           icon={<TrendingUp size={20} />}
         >
           <RatingTrendsChart data={data.rating_trends} />
+        </ChartCard>
+
+        <ChartCard
+          title="Rating Deviation Trends"
+          description="Confidence intervals (RD) decreasing as models solve more puzzles"
+          icon={<Activity size={20} />}
+        >
+          <RatingDeviationChart data={data.rating_trends} />
         </ChartCard>
 
         <ChartCard
@@ -107,6 +111,19 @@ export function Analytics() {
         >
           <TokenUsageChart data={data.token_usage} />
         </ChartCard>
+
+        <ChartCard
+          title="Final Rating Confidence Intervals"
+          description="95% confidence intervals (±2 RD) compared against the benchmark puzzle difficulty (green band)"
+          icon={<Target size={20} />}
+          minHeight="600px"
+        >
+          <FinalRatingsIntervalsChart
+            data={data.final_ratings}
+            weightedRating={data.weighted_puzzle_rating}
+            weightedDeviation={data.weighted_puzzle_deviation}
+          />
+        </ChartCard>
       </div>
     </div>
   );
@@ -117,18 +134,9 @@ export function Analytics() {
  */
 function AnalyticsSkeleton() {
   return (
-    <div className="container" style={{ paddingTop: '2rem' }}>
-      <div className="skeleton" style={{ height: '3rem', width: '300px', marginBottom: '1rem' }} />
-      <div
-        className="skeleton"
-        style={{ height: '1.5rem', width: '500px', marginBottom: '3rem' }}
-      />
-
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' }}
-      >
-        {[...Array(4)].map((_, i) => (
+    <div className="container" style={{ paddingTop: '2rem', paddingBottom: '5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+        {[...Array(6)].map((_, i) => (
           <div
             key={i}
             className="skeleton"

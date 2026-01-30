@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Chart as ChartJS,
-  CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
@@ -15,19 +14,19 @@ import { Line } from 'react-chartjs-2';
 import { BenchmarkDataResponse } from '../../api/types';
 
 // Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-interface RatingTrendsChartProps {
+interface RatingDeviationChartProps {
   data: BenchmarkDataResponse[];
 }
 
 /**
- * Line chart component showing the rating trends of agents over time.
- * Uses BenchmarkDataResponse from the API.
+ * Line chart component showing the rating deviation (RD) trends of agents.
+ * As more games are played, the RD should decrease, indicating higher certainty.
  * @param props - Component props
- * @param props.data - The rating trends data
+ * @param props.data - The benchmark data containing RD
  */
-export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) => {
+export const RatingDeviationChart: React.FC<RatingDeviationChartProps> = ({ data }) => {
   // Group data by agent
   const agents = Array.from(new Set(data.map((d) => d.agent_name)));
 
@@ -37,10 +36,10 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
       .filter((d) => d.agent_name === agent)
       .sort((a, b) => a.evaluation_index - b.evaluation_index);
 
-    // Map agent data to { x, y } points for linear scale
+    // Map agent data to { x, y } points (index, deviation)
     const dataPoints = agentData.map((d) => ({
       x: d.evaluation_index,
-      y: d.agent_rating,
+      y: d.agent_deviation,
     }));
 
     // Cycle through a larger palette of high-contrast distinct colors
@@ -64,11 +63,11 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
       label: agent,
       data: dataPoints,
       borderColor: color,
-      backgroundColor: color + '33', // 20% opacity
-      tension: 0.3,
+      backgroundColor: color + '33',
       borderWidth: 2,
-      pointRadius: 0, // Hide points by default for performance and clarity
-      pointHoverRadius: 5, // Show point on hover
+      pointRadius: 0,
+      pointHoverRadius: 5,
+      tension: 0.1, // Less tension for RD as it's usually a smoother decline
       spanGaps: true,
     };
   });
@@ -89,7 +88,7 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#94a3b8', // --text-secondary
+          color: '#94a3b8',
           font: {
             family: "'Inter', sans-serif",
             size: 11,
@@ -111,6 +110,10 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
             const index = tooltipItems[0].parsed.x;
             return `Evaluation #${index}`;
           },
+          label: (context) => {
+            const val = context.parsed.y !== null ? Math.round(context.parsed.y as number) : 0;
+            return ` ${context.dataset.label}: ±${val} RD`;
+          },
         },
       },
     },
@@ -122,8 +125,7 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
         },
         ticks: {
           color: '#94a3b8',
-          maxTicksLimit: 10, // Limit ticks for better performance and clarity
-          precision: 0,
+          maxTicksLimit: 10,
         },
         title: {
           display: true,
@@ -135,6 +137,7 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
         },
       },
       y: {
+        beginAtZero: true,
         grid: {
           color: 'rgba(148, 163, 184, 0.1)',
         },
@@ -143,7 +146,7 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
         },
         title: {
           display: true,
-          text: 'Glicko-2 Rating',
+          text: 'Rating Deviation (RD)',
           color: '#94a3b8',
           font: {
             size: 11,
