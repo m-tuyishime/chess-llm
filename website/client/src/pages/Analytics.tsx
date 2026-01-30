@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { AnalyticsResponse } from '../api/types';
 import { ChartCard } from '../components/ChartCard';
@@ -16,6 +17,7 @@ import { AlertTriangle, PieChart, Zap, TrendingUp, Activity, Target } from 'luci
  * Displays interactive charts and model performance comparisons.
  */
 export function Analytics() {
+  const { t } = useTranslation();
   const [data, setData] = useState<AnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +30,14 @@ export function Analytics() {
         setData(analyticsData);
       } catch (err) {
         console.error('Failed to fetch analytics:', err);
-        setError('Failed to load analytics data. Please try again later.');
+        setError(t('common.error') + ': Failed to load analytics data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchAnalytics();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return <AnalyticsSkeleton />;
@@ -52,14 +54,14 @@ export function Analytics() {
             size={48}
             style={{ color: 'var(--status-failed-text)', marginBottom: '1rem' }}
           />
-          <h2>Error</h2>
+          <h2>{t('common.error')}</h2>
           <p>{error || 'An unexpected error occurred'}</p>
           <button
             className="btn btn-primary"
             onClick={() => window.location.reload()}
             style={{ marginTop: '1.5rem' }}
           >
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       </div>
@@ -73,48 +75,48 @@ export function Analytics() {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
         <ChartCard
-          title="Model Rating Trends"
-          description="Glicko-2 rating evolution across evaluation periods"
+          title={t('analytics.charts.ratingTrends.title')}
+          description={t('analytics.charts.ratingTrends.desc')}
           icon={<TrendingUp size={20} />}
         >
           <RatingTrendsChart data={data.rating_trends} />
         </ChartCard>
 
         <ChartCard
-          title="Rating Deviation Trends"
-          description="Confidence intervals (RD) decreasing as models solve more puzzles"
+          title={t('analytics.charts.ratingDeviation.title')}
+          description={t('analytics.charts.ratingDeviation.desc')}
           icon={<Activity size={20} />}
         >
           <RatingDeviationChart data={data.rating_trends} />
         </ChartCard>
 
         <ChartCard
-          title="Illegal Move Rate"
-          description="Percentage of attempted moves that were invalid according to FIDE rules"
+          title={t('analytics.charts.illegalMoves.title')}
+          description={t('analytics.charts.illegalMoves.desc')}
           icon={<AlertTriangle size={20} />}
         >
           <IllegalMovesChart data={data.illegal_moves} />
         </ChartCard>
 
         <ChartCard
-          title="Overall Puzzle Outcomes"
-          description="Success vs failure counts aggregated by puzzle theme"
+          title={t('analytics.charts.puzzleOutcomes.title')}
+          description={t('analytics.charts.puzzleOutcomes.desc')}
           icon={<PieChart size={20} />}
         >
           <PuzzleOutcomesChart data={data.puzzle_outcomes} />
         </ChartCard>
 
         <ChartCard
-          title="Token Efficiency"
-          description="Average prompt and completion tokens used per move"
+          title={t('analytics.charts.tokenEfficiency.title')}
+          description={t('analytics.charts.tokenEfficiency.desc')}
           icon={<Zap size={20} />}
         >
           <TokenUsageChart data={data.token_usage} />
         </ChartCard>
 
         <ChartCard
-          title="Final Rating Confidence Intervals"
-          description="95% confidence intervals (±2 RD) compared against the benchmark puzzle difficulty (green band)"
+          title={t('analytics.charts.finalRatings.title')}
+          description={t('analytics.charts.finalRatings.desc')}
           icon={<Target size={20} />}
           minHeight="600px"
         >

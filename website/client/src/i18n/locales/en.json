@@ -1,0 +1,152 @@
+{
+  "nav": {
+    "title": "Chess LLM Arena",
+    "leaderboard": "Leaderboard",
+    "analytics": "Analytics",
+    "about": "About",
+    "toggleTheme": "Toggle Theme",
+    "toggleLanguage": "Toggle Language"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top performing LLM Chess Agents",
+    "activeAgents": "{{count}} Agents Active",
+    "table": {
+      "rank": "Rank",
+      "model": "Model",
+      "rating": "Rating",
+      "rd": "RD",
+      "winRate": "Win Rate",
+      "games": "Games"
+    }
+  },
+  "agentDetail": {
+    "backToLeaderboard": "Back to Leaderboard",
+    "rating": "Rating",
+    "gamesPlayed": "Games Played",
+    "winRate": "Win Rate",
+    "isReasoning": "Reasoning Model",
+    "isRandom": "Random Baseline",
+    "performanceBreakdown": "Performance Breakdown",
+    "gameHistory": "Game History",
+    "filters": {
+      "allTypes": "All Types",
+      "allOutcomes": "All Outcomes",
+      "success": "Success",
+      "failed": "Failed"
+    },
+    "table": {
+      "puzzle": "Puzzle",
+      "type": "Type",
+      "outcome": "Outcome",
+      "moves": "Moves",
+      "date": "Date"
+    }
+  },
+  "replay": {
+    "backToAgent": "Back to Agent",
+    "gameDetails": "Game Details",
+    "model": "Model",
+    "puzzleId": "Puzzle ID",
+    "outcome": "Outcome",
+    "success": "Success",
+    "failed": "Failed",
+    "moves": "Moves",
+    "viewOnLichess": "View on Lichess",
+    "illegalMove": "Illegal Move",
+    "hallucination": "Piece Ownership Hallucination",
+    "controls": {
+      "first": "First Move",
+      "prev": "Previous Move",
+      "next": "Next Move",
+      "last": "Last Move"
+    },
+    "history": {
+      "title": "Move History",
+      "white": "White",
+      "black": "Black",
+      "step": "Step {{step}}",
+      "illegalAttempt": "Illegal attempt: {{move}}",
+      "reason": "Reason: {{reason}}"
+    },
+    "messages": {
+      "hallucination": "The agent tried to move a non-existent {{piece}} to {{target}} (Hallucination).",
+      "illegal": "The agent tried to move {{piece}} to {{target}}, but it was an illegal move.",
+      "genericIllegal": "The agent selected an illegal move ({{move}}).",
+      "incorrect": "The agent played {{move}}, but the optimal move was {{expected}}.",
+      "notationError": "Notation Error",
+      "illegalMove": "Illegal Move",
+      "incorrectMove": "Incorrect Move"
+    }
+  },
+  "analytics": {
+    "charts": {
+      "ratingTrends": {
+        "title": "Model Rating Trends",
+        "desc": "Glicko-2 rating evolution across evaluation periods"
+      },
+      "ratingDeviation": {
+        "title": "Rating Deviation Trends",
+        "desc": "Confidence intervals (RD) decreasing as models solve more puzzles"
+      },
+      "illegalMoves": {
+        "title": "Illegal Move Rate",
+        "desc": "Percentage of attempted moves that were invalid according to FIDE rules"
+      },
+      "puzzleOutcomes": {
+        "title": "Overall Puzzle Outcomes",
+        "desc": "Success vs failure counts aggregated by puzzle theme"
+      },
+      "tokenEfficiency": {
+        "title": "Token Efficiency",
+        "desc": "Average prompt and completion tokens used per move"
+      },
+      "finalRatings": {
+        "title": "Final Rating Confidence Intervals",
+        "desc": "95% confidence intervals (±2 RD) compared against the benchmark puzzle difficulty (green band)"
+      }
+    }
+  },
+  "about": {
+    "header": {
+      "title": "Chess LLM Arena",
+      "subtitle": "Comparative Analysis of Language Model Performance in Chess",
+      "originalTitle": "Original Title: Analyse comparative des performances des modèles de langage dans le jeu d'échecs",
+      "readReport": "Read Full Report (French only)"
+    },
+    "abstract": {
+      "title": "Abstract",
+      "p1": "This work presents an evaluation of various Large Language Models (LLMs) on chess puzzle solving tasks. We developed an automatic evaluation system that uses the Glicko-2 rating to compare the performance of five models. The evaluation consisted of testing these models on a diverse set of chess puzzles from the Lichess database, distributed across three themes: End Game, Strategic, and Tactic.",
+      "p2": "Our results reveal that they all obtained a ranking lower than the average level of approximately 1500. The best performing model (nvidia/llama-3.1-nemotron-ultra-253b-v1) only reached about 705 ± 81 points. We observed that the size and architecture of the model did not systematically correlate with performance.",
+      "p3": "This research highlights the current limitations of LLMs in chess reasoning tasks and suggests that neither model size nor Chain-of-Thought training are indicators of performance in complex strategic games."
+    },
+    "methodology": {
+      "title": "Methodology",
+      "framework": "Framework: Automated Python evaluation system using Glicko-2 ratings.",
+      "dataset": "Dataset: 1,400 puzzles from Lichess (Endgame, Strategic, Tactics).",
+      "models": "Models: 5 LLMs tested via Nvidia NIM & OpenRouter APIs.",
+      "baselines": "Baselines: Stockfish (~1500 Elo) and Random Agent."
+    },
+    "findings": {
+      "title": "Key Findings",
+      "performance": "Sub-Human Performance: Best model reached ~705 Elo (vs 1500 human avg).",
+      "size": "Size ≠ Skill: Larger models (405B) did not significantly outperform smaller ones.",
+      "hallucinations": "Hallucinations: High rate of illegal moves, especially without Chain-of-Thought.",
+      "gap": "Reasoning Gap: LLMs struggle with strict logic and lookahead planning."
+    },
+    "team": {
+      "title": "Research Team",
+      "authors": "Authors",
+      "supervisor": "Supervisor",
+      "institution": "Institution",
+      "institutionName": "Université du Québec en Outaouais (UQO)",
+      "department": "Département d'informatique et d'ingénierie"
+    }
+  },
+  "common": {
+    "error": "Error",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "noData": "No data available"
+  }
+}

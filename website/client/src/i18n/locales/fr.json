@@ -1,0 +1,152 @@
+{
+  "nav": {
+    "title": "Chess LLM Arena",
+    "leaderboard": "Classement",
+    "analytics": "Analyses",
+    "about": "À propos",
+    "toggleTheme": "Changer le thème",
+    "toggleLanguage": "Changer la langue"
+  },
+  "leaderboard": {
+    "title": "Classement",
+    "subtitle": "Agents d'échecs LLM les plus performants",
+    "activeAgents": "{{count}} agents actifs",
+    "table": {
+      "rank": "Rang",
+      "model": "Modèle",
+      "rating": "Rating",
+      "rd": "RD",
+      "winRate": "Taux de victoire",
+      "games": "Parties"
+    }
+  },
+  "agentDetail": {
+    "backToLeaderboard": "Retour au classement",
+    "rating": "Rating",
+    "gamesPlayed": "Parties jouées",
+    "winRate": "Taux de victoire",
+    "isReasoning": "Modèle de raisonnement",
+    "isRandom": "Référence aléatoire",
+    "performanceBreakdown": "Détail des performances",
+    "gameHistory": "Historique des parties",
+    "filters": {
+      "allTypes": "Tous les types",
+      "allOutcomes": "Tous les résultats",
+      "success": "Succès",
+      "failed": "Échec"
+    },
+    "table": {
+      "puzzle": "Problème",
+      "type": "Type",
+      "outcome": "Résultat",
+      "moves": "Coups",
+      "date": "Date"
+    }
+  },
+  "replay": {
+    "backToAgent": "Retour à l'agent",
+    "gameDetails": "Détails de la partie",
+    "model": "Modèle",
+    "puzzleId": "ID du problème",
+    "outcome": "Résultat",
+    "success": "Succès",
+    "failed": "Échec",
+    "moves": "Coups",
+    "viewOnLichess": "Voir sur Lichess",
+    "illegalMove": "Coup illégal",
+    "hallucination": "Hallucination de propriété de pièce",
+    "controls": {
+      "first": "Premier coup",
+      "prev": "Coup précédent",
+      "next": "Coup suivant",
+      "last": "Dernier coup"
+    },
+    "history": {
+      "title": "Historique des coups",
+      "white": "Blancs",
+      "black": "Noirs",
+      "step": "Étape {{step}}",
+      "illegalAttempt": "Tentative illégale : {{move}}",
+      "reason": "Raison : {{reason}}"
+    },
+    "messages": {
+      "hallucination": "L'agent a tenté de déplacer une pièce {{piece}} inexistante vers {{target}} (Hallucination).",
+      "illegal": "L'agent a tenté de déplacer {{piece}} vers {{target}}, mais c'était un coup illégal.",
+      "genericIllegal": "L'agent a sélectionné un coup illégal ({{move}}).",
+      "incorrect": "L'agent a joué {{move}}, mais le coup optimal était {{expected}}.",
+      "notationError": "Erreur de notation",
+      "illegalMove": "Coup illégal",
+      "incorrectMove": "Coup incorrect"
+    }
+  },
+  "analytics": {
+    "charts": {
+      "ratingTrends": {
+        "title": "Tendances du classement des modèles",
+        "desc": "Évolution du classement Glicko-2 selon les périodes d'évaluation"
+      },
+      "ratingDeviation": {
+        "title": "Tendances de l'écart de classement",
+        "desc": "Diminution des intervalles de confiance (RD) à mesure que les modèles résolvent des problèmes"
+      },
+      "illegalMoves": {
+        "title": "Taux de coups illégaux",
+        "desc": "Pourcentage de tentatives de coups invalides selon les règles de la FIDE"
+      },
+      "puzzleOutcomes": {
+        "title": "Résultats globaux des problèmes",
+        "desc": "Nombre de succès vs échecs agrégés par thème de problème"
+      },
+      "tokenEfficiency": {
+        "title": "Efficacité des jetons",
+        "desc": "Moyenne des jetons de prompt et de complétion utilisés par coup"
+      },
+      "finalRatings": {
+        "title": "Intervalles de confiance du classement final",
+        "desc": "Intervalles de confiance à 95 % (±2 RD) comparés à la difficulté de référence des problèmes (bande verte)"
+      }
+    }
+  },
+  "about": {
+    "header": {
+      "title": "Chess LLM Arena",
+      "subtitle": "Analyse comparative des performances des modèles de langage dans le jeu d'échecs",
+      "originalTitle": "Titre original : Analyse comparative des performances des modèles de langage dans le jeu d'échecs",
+      "readReport": "Lire le rapport complet (en français uniquement)"
+    },
+    "abstract": {
+      "title": "Résumé",
+      "p1": "Ce travail présente une évaluation de divers grands modèles de langage (LLM) sur des tâches de résolution de problèmes d'échecs. Nous avons développé un système d'évaluation automatique utilisant le classement Glicko-2 pour comparer les performances de cinq modèles. L'évaluation a consisté à tester ces modèles sur un ensemble varié de problèmes d'échecs provenant de la base de données Lichess, répartis en trois thèmes : Fin de partie, Stratégique et Tactique.",
+      "p2": "Nos résultats révèlent qu'ils ont tous obtenu un classement inférieur au niveau moyen d'environ 1500. Le modèle le plus performant (nvidia/llama-3.1-nemotron-ultra-253b-v1) n'a atteint qu'environ 705 ± 81 points. Nous avons observé que la taille et l'architecture du modèle n'étaient pas systématiquement corrélées à la performance.",
+      "p3": "Cette recherche met en évidence les limites actuelles des LLM dans les tâches de raisonnement aux échecs et suggère que ni la taille du modèle ni l'entraînement par chaîne de pensée (Chain-of-Thought) ne sont des indicateurs de performance dans les jeux stratégiques complexes."
+    },
+    "methodology": {
+      "title": "Méthodologie",
+      "framework": "Cadre : Système d'évaluation Python automatisé utilisant les classements Glicko-2.",
+      "dataset": "Données : 1 400 problèmes de Lichess (Fin de partie, Stratégique, Tactique).",
+      "models": "Modèles : 5 LLM testés via les API Nvidia NIM et OpenRouter.",
+      "baselines": "Références : Stockfish (~1500 Elo) et agent aléatoire."
+    },
+    "findings": {
+      "title": "Résultats clés",
+      "performance": "Performance sous-humaine : Le meilleur modèle a atteint ~705 Elo (contre 1500 de moyenne humaine).",
+      "size": "Taille ≠ Compétence : Les modèles plus grands (405B) n'ont pas surpassé de manière significative les plus petits.",
+      "hallucinations": "Hallucinations : Taux élevé de coups illégaux, surtout sans chaîne de pensée.",
+      "gap": "Écart de raisonnement : Les LLM éprouvent des difficultés avec la logique stricte et la planification par anticipation."
+    },
+    "team": {
+      "title": "Équipe de recherche",
+      "authors": "Auteurs",
+      "supervisor": "Directeur",
+      "institution": "Institution",
+      "institutionName": "Université du Québec en Outaouais (UQO)",
+      "department": "Département d'informatique et d'ingénierie"
+    }
+  },
+  "common": {
+    "error": "Erreur",
+    "retry": "Réessayer",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible"
+  }
+}

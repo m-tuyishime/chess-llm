@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, SkipBack, SkipForward, Menu, X, ExternalLink } from 'lucide-react';
 import { api } from '../api/client';
 import { GameResponse, PuzzleResponse } from '../api/types';
@@ -17,6 +18,7 @@ import './ReplayPage.css';
  * @returns The ReplayPage component.
  */
 export function ReplayPage() {
+  const { t } = useTranslation();
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
 
@@ -125,7 +127,7 @@ export function ReplayPage() {
         className="replay-full-screen"
         style={{ justifyContent: 'center', alignItems: 'center' }}
       >
-        Loading...
+        {t('common.loading')}
       </div>
     );
   if (error)
@@ -138,7 +140,7 @@ export function ReplayPage() {
           color: 'var(--status-failed-text)',
         }}
       >
-        Error: {error}
+        {t('common.error')}: {error}
       </div>
     );
   if (!game)
@@ -147,7 +149,7 @@ export function ReplayPage() {
         className="replay-full-screen"
         style={{ justifyContent: 'center', alignItems: 'center' }}
       >
-        Game not found
+        {t('common.noData')}
       </div>
     );
 
@@ -193,7 +195,7 @@ export function ReplayPage() {
             onClick={() => goToMove(-1)}
             disabled={currentMoveIndex === -1}
             className="btn-control"
-            aria-label="First Move"
+            aria-label={t('replay.controls.first')}
           >
             <SkipBack size={24} />
           </button>
@@ -201,7 +203,7 @@ export function ReplayPage() {
             onClick={() => goToMove(currentMoveIndex - 1)}
             disabled={currentMoveIndex === -1}
             className="btn-control"
-            aria-label="Previous Move"
+            aria-label={t('replay.controls.prev')}
           >
             <ArrowLeft size={24} />
           </button>
@@ -215,7 +217,7 @@ export function ReplayPage() {
             onClick={() => goToMove(currentMoveIndex + 1)}
             disabled={currentMoveIndex >= game.moves.length - 1}
             className="btn-control"
-            aria-label="Next Move"
+            aria-label={t('replay.controls.next')}
           >
             <ArrowRight size={24} />
           </button>
@@ -223,14 +225,16 @@ export function ReplayPage() {
             onClick={() => goToMove(game.moves.length - 1)}
             disabled={currentMoveIndex >= game.moves.length - 1}
             className="btn-control"
-            aria-label="Last Move"
+            aria-label={t('replay.controls.last')}
           >
             <SkipForward size={24} />
           </button>
         </div>
 
         <div className="keyboard-legend">
-          <small>← / → : Prev/Next Move</small>
+          <small>
+            ← / → : {t('replay.controls.prev')}/{t('replay.controls.next')}
+          </small>
         </div>
       </div>
 
@@ -245,9 +249,9 @@ export function ReplayPage() {
                   navigate(game?.agent_name ? `/agent/${game.agent_name}` : '/leaderboard')
                 }
                 className="btn-control btn-back-agent"
-                aria-label="Back to Agent"
+                aria-label={t('replay.backToAgent')}
               >
-                <ArrowLeft size={16} className="mr-2" /> Back to Agent
+                <ArrowLeft size={16} className="mr-2" /> {t('replay.backToAgent')}
               </button>
               <button
                 onClick={() => setIsSidebarOpen(false)}
@@ -259,9 +263,12 @@ export function ReplayPage() {
             </div>
 
             <div>
-              <h1 className="replay-title sidebar-title">{game.agent_name || 'Agent'} Replay</h1>
+              <h1 className="replay-title sidebar-title">
+                {game.agent_name || 'Agent'} {t('replay.gameDetails')}
+              </h1>
               <p className="sidebar-subtitle">
-                {new Date(game.date).toLocaleDateString()} • {game.failed ? 'Failed' : 'Solved'}
+                {new Date(game.date).toLocaleDateString()} •{' '}
+                {game.failed ? t('replay.failed') : t('replay.success')}
               </p>
               <div className="agent-badge">
                 <span>Playing as:</span>
@@ -273,10 +280,10 @@ export function ReplayPage() {
           {/* Analysis */}
           <div className="sidebar-section">
             <div className="sidebar-section-header">
-              Analysis
+              {t('analytics.charts.puzzleOutcomes.title')}
               {game.failed && (
                 <span style={{ color: 'var(--status-failed-text)', fontSize: '0.75rem' }}>
-                  FAILED
+                  {t('replay.failed').toUpperCase()}
                 </span>
               )}
             </div>
@@ -285,7 +292,7 @@ export function ReplayPage() {
                 <div className="puzzle-meta">
                   <div className="puzzle-stat-row">
                     <div>
-                      <div className="stat-label">Rating</div>
+                      <div className="stat-label">{t('leaderboard.table.rating')}</div>
                       <div className="stat-value">{puzzle.rating}</div>
                     </div>
                     <div className="puzzle-stat-right">
@@ -296,7 +303,7 @@ export function ReplayPage() {
 
                   <div className="puzzle-id-box">
                     <div>
-                      <div className="stat-label stat-label-sm">Puzzle ID</div>
+                      <div className="stat-label stat-label-sm">{t('replay.puzzleId')}</div>
                       <div className="stat-value puzzle-id-value">{puzzle.id}</div>
                     </div>
                     <a
@@ -304,8 +311,8 @@ export function ReplayPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-control btn-open-lichess"
-                      title="Open on Lichess"
-                      aria-label="Open on Lichess"
+                      title={t('replay.viewOnLichess')}
+                      aria-label={t('replay.viewOnLichess')}
                     >
                       <ExternalLink size={14} />
                       Open

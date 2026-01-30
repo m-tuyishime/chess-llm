@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next';
+
 /**
  * About Page component.
  * Displays information about the project based on the research report.
  */
 export function About() {
+  const { t } = useTranslation();
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Header Section */}
@@ -17,14 +21,13 @@ export function About() {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Chess LLM Arena
+          {t('about.header.title')}
         </h1>
         <h2 style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', fontWeight: '400' }}>
-          Comparative Analysis of Language Model Performance in Chess
+          {t('about.header.subtitle')}
         </h2>
         <p style={{ marginTop: '0.5rem', fontStyle: 'italic', color: 'var(--text-tertiary)' }}>
-          Original Title: Analyse comparative des performances des modèles de langage dans le jeu
-          d'échecs
+          {t('about.header.originalTitle')}
         </p>
 
         <div style={{ marginTop: '2rem' }}>
@@ -35,31 +38,22 @@ export function About() {
             className="btn btn-primary"
             style={{ textDecoration: 'none' }}
           >
-            📄 Read Full Report (French only)
+            📄 {t('about.header.readReport')}
           </a>
         </div>
       </section>
 
       {/* Abstract Section */}
       <div className="card">
-        <h3>Abstract</h3>
+        <h3>{t('about.abstract.title')}</h3>
         <p style={{ lineHeight: '1.6', color: 'var(--text-secondary)' }}>
-          This work presents an evaluation of various Large Language Models (LLMs) on chess puzzle
-          solving tasks. We developed an automatic evaluation system that uses the Glicko-2 rating
-          to compare the performance of five models. The evaluation consisted of testing these
-          models on a diverse set of chess puzzles from the Lichess database, distributed across
-          three themes: End Game, Strategic, and Tactic.
+          {t('about.abstract.p1')}
         </p>
         <p style={{ lineHeight: '1.6', color: 'var(--text-secondary)', marginTop: '1rem' }}>
-          Our results reveal that they all obtained a ranking lower than the average level of
-          approximately 1500. The best performing model (nvidia/llama-3.1-nemotron-ultra-253b-v1)
-          only reached about 705 ± 81 points. We observed that the size and architecture of the
-          model did not systematically correlate with performance.
+          {t('about.abstract.p2')}
         </p>
         <p style={{ lineHeight: '1.6', color: 'var(--text-secondary)', marginTop: '1rem' }}>
-          This research highlights the current limitations of LLMs in chess reasoning tasks and
-          suggests that neither model size nor Chain-of-Thought training are indicators of
-          performance in complex strategic games.
+          {t('about.abstract.p3')}
         </p>
       </div>
 
@@ -77,20 +71,24 @@ export function About() {
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}
           >
             <span style={{ fontSize: '1.5rem' }}>🔬</span>
-            <h3 style={{ margin: 0 }}>Methodology</h3>
+            <h3 style={{ margin: 0 }}>{t('about.methodology.title')}</h3>
           </div>
           <ul style={{ paddingLeft: '1.5rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Framework:</strong> Automated Python evaluation system using Glicko-2 ratings.
+              <strong>{t('about.methodology.framework').split(':')[0]}:</strong>
+              {t('about.methodology.framework').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Dataset:</strong> 1,400 puzzles from Lichess (Endgame, Strategic, Tactics).
+              <strong>{t('about.methodology.dataset').split(':')[0]}:</strong>
+              {t('about.methodology.dataset').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Models:</strong> 5 LLMs tested via Nvidia NIM & OpenRouter APIs.
+              <strong>{t('about.methodology.models').split(':')[0]}:</strong>
+              {t('about.methodology.models').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Baselines:</strong> Stockfish (~1500 Elo) and Random Agent.
+              <strong>{t('about.methodology.baselines').split(':')[0]}:</strong>
+              {t('about.methodology.baselines').split(':')[1]}
             </li>
           </ul>
         </div>
@@ -101,24 +99,24 @@ export function About() {
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}
           >
             <span style={{ fontSize: '1.5rem' }}>📊</span>
-            <h3 style={{ margin: 0 }}>Key Findings</h3>
+            <h3 style={{ margin: 0 }}>{t('about.findings.title')}</h3>
           </div>
           <ul style={{ paddingLeft: '1.5rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Sub-Human Performance:</strong> Best model reached ~705 Elo (vs 1500 human
-              avg).
+              <strong>{t('about.findings.performance').split(':')[0]}:</strong>
+              {t('about.findings.performance').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Size ≠ Skill:</strong> Larger models (405B) did not significantly outperform
-              smaller ones.
+              <strong>{t('about.findings.size').split(':')[0]}:</strong>
+              {t('about.findings.size').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Hallucinations:</strong> High rate of illegal moves, especially without
-              Chain-of-Thought.
+              <strong>{t('about.findings.hallucinations').split(':')[0]}:</strong>
+              {t('about.findings.hallucinations').split(':')[1]}
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
-              <strong>Reasoning Gap:</strong> LLMs struggle with strict logic and lookahead
-              planning.
+              <strong>{t('about.findings.gap').split(':')[0]}:</strong>
+              {t('about.findings.gap').split(':')[1]}
             </li>
           </ul>
         </div>
@@ -126,7 +124,7 @@ export function About() {
 
       {/* Contributors Section */}
       <div className="card">
-        <h3>Research Team</h3>
+        <h3>{t('about.team.title')}</h3>
         <div
           style={{
             display: 'grid',
@@ -136,7 +134,9 @@ export function About() {
           }}
         >
           <div>
-            <h4 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>Authors</h4>
+            <h4 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
+              {t('about.team.authors')}
+            </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-primary)' }}>
               <li style={{ padding: '0.25rem 0' }}>Muhoza Olivier Tuyishime</li>
               <li style={{ padding: '0.25rem 0' }}>William McAllister</li>
@@ -144,18 +144,22 @@ export function About() {
           </div>
 
           <div>
-            <h4 style={{ color: 'var(--accent-secondary)', marginBottom: '0.5rem' }}>Supervisor</h4>
+            <h4 style={{ color: 'var(--accent-secondary)', marginBottom: '0.5rem' }}>
+              {t('about.team.supervisor')}
+            </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-primary)' }}>
               <li style={{ padding: '0.25rem 0' }}>Alan Davoust</li>
             </ul>
           </div>
 
           <div>
-            <h4 style={{ color: 'var(--text-tertiary)', marginBottom: '0.5rem' }}>Institution</h4>
+            <h4 style={{ color: 'var(--text-tertiary)', marginBottom: '0.5rem' }}>
+              {t('about.team.institution')}
+            </h4>
             <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
-              Université du Québec en Outaouais (UQO)
+              {t('about.team.institutionName')}
               <br />
-              Département d'informatique et d'ingénierie
+              {t('about.team.department')}
             </p>
           </div>
         </div>
