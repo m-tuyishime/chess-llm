@@ -147,7 +147,7 @@ class JSONRepository(GameRepository):
         agent["is_reasoning"] = agent.pop("reasoning", agent.get("is_reasoning", False))
         agent["is_random"] = agent.pop("random", agent.get("is_random", False))
 
-        return AgentData(**agent)  # type: ignore[misc]
+        return AgentData(**agent)
 
     def get_all_agents(self) -> list[AgentData]:
         """Get all agents.
@@ -227,7 +227,7 @@ class JSONRepository(GameRepository):
         moves = self.moves_df[self.moves_df["game_id"] == game_id]
         game["moves"] = [MoveRecord(**row) for _, row in moves.iterrows()]
 
-        return Game(**game)
+        return Game(**game)  # type: ignore[misc]
 
     def get_agent_games(self, agent_name: str) -> list[Game]:
         """Get all games for an agent (without move details).
