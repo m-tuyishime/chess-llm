@@ -1,9 +1,10 @@
-ipykernel
-chess
+python-chess
 pandas
 matplotlib
 numpy
 glicko2
 aiolimiter
-asyncio
 openai
+fastapi
+uvicorn
+pydantic
