@@ -116,6 +116,7 @@ class SQLiteRepository:
 
         # Indexes for performance
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_game_agent_name ON game(agent_name)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_game_puzzle_id ON game(puzzle_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_move_game_id ON move(game_id)")
 
         self.conn.commit()
@@ -559,22 +560,14 @@ class SQLiteRepository:
 
     def get_final_ratings_data(self) -> pd.DataFrame:
         """
-        Get each agent's most recent rating and rating deviation using the latest benchmark id.
+        Get each agent's most recent rating and rating deviation from the agent table.
         Returns columns: agent_name, agent_rating, agent_deviation.
         """
         query = """
-            SELECT m.name AS agent_name,
-                b.agent_rating,
-                b.agent_deviation
-            FROM agent m
-            JOIN game g ON g.agent_name = m.name
-            JOIN benchmark b ON b.game_id = g.id
-            WHERE b.id = (
-                SELECT MAX(b2.id)
-                FROM benchmark b2
-                JOIN game g2 ON b2.game_id = g2.id
-                WHERE g2.agent_name = m.name
-            )
+            SELECT name AS agent_name,
+                rating AS agent_rating,
+                rd AS agent_deviation
+            FROM agent
         """
         return pd.read_sql_query(query, self.conn)
 
