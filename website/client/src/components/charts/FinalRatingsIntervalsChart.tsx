@@ -190,77 +190,82 @@ export const FinalRatingsIntervalsChart: React.FC<FinalRatingsIntervalsChartProp
     ],
   };
 
-  const options: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: {
-      padding: {
-        top: 20,
-        bottom: 40, // More bottom padding for slanted labels
-      },
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        position: 'top' as const,
-        labels: {
-          color: '#94a3b8',
-          font: { family: "'Inter', sans-serif", size: 11 },
-          usePointStyle: true,
-          padding: 15,
+  const options: ChartOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 40, // More bottom padding for slanted labels
         },
       },
-      tooltip: {
-        backgroundColor: '#1e293b',
-        titleColor: '#f8fafc',
-        bodyColor: '#f8fafc',
-        borderColor: '#334155',
-        borderWidth: 1,
-        padding: 12,
-        cornerRadius: 8,
-        callbacks: {
-          label: (context) => {
-            const item = sortedData[context.dataIndex];
-            if (context.dataset.label === 'Model Final Rating') {
-              return ` Rating: ${Math.round(item.agent_rating)} (±${Math.round(
-                item.agent_deviation
-              )} RD)`;
-            }
-            return '';
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false,
+      },
+      animation: false,
+      plugins: {
+        legend: {
+          position: 'top' as const,
+          labels: {
+            color: '#94a3b8',
+            font: { family: "'Inter', sans-serif", size: 11 },
+            usePointStyle: true,
+            padding: 15,
+          },
+        },
+        tooltip: {
+          backgroundColor: '#1e293b',
+          titleColor: '#f8fafc',
+          bodyColor: '#f8fafc',
+          borderColor: '#334155',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            label: (context) => {
+              const item = sortedData[context.dataIndex];
+              if (context.dataset.label === 'Model Final Rating') {
+                return ` Rating: ${Math.round(item.agent_rating)} (±${Math.round(
+                  item.agent_deviation
+                )} RD)`;
+              }
+              return '';
+            },
           },
         },
       },
-    },
-    scales: {
-      x: {
-        type: 'category',
-        grid: { display: false },
-        ticks: {
-          color: '#94a3b8',
-          autoSkip: false,
-          maxRotation: 45,
-          minRotation: 45,
-          font: { size: 10 },
+      scales: {
+        x: {
+          type: 'category',
+          grid: { display: false },
+          ticks: {
+            color: '#94a3b8',
+            autoSkip: false,
+            maxRotation: 45,
+            minRotation: 45,
+            font: { size: 10 },
+          },
+        },
+        y: {
+          type: 'linear' as const,
+          min: yRange.min,
+          max: yRange.max,
+          grid: { color: 'rgba(148, 163, 184, 0.1)' },
+          ticks: { color: '#94a3b8', maxTicksLimit: 10, stepSize: 100 },
+          title: {
+            display: true,
+            text: 'Glicko-2 Rating',
+            color: '#94a3b8',
+            font: { size: 11, weight: 'bold' },
+          },
         },
       },
-      y: {
-        min: yRange.min,
-        max: yRange.max,
-        grid: { color: 'rgba(148, 163, 184, 0.1)' },
-        ticks: { color: '#94a3b8' },
-        title: {
-          display: true,
-          text: 'Glicko-2 Rating',
-          color: '#94a3b8',
-          font: { size: 11, weight: 'bold' },
-        },
-      },
-    },
-  };
+    }),
+    [yRange, sortedData]
+  );
 
   return (
     <Chart
