@@ -85,6 +85,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pydantic" },
     { name = "python-chess" },
+    { name = "python-dateutil" },
     { name = "uvicorn" },
 ]
 
@@ -112,6 +113,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "python-chess" },
+    { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "python-dotenv", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "uvicorn" },
