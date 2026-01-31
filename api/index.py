@@ -6,4 +6,4 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 # Import the FastAPI app from the website server
-from website.server.main import app
+from website.server.main import app  # noqa: F401
