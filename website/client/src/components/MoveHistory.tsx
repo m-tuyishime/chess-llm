@@ -1,6 +1,4 @@
-// React import removed (unused)
-// Icons removed (unused)
-
+import { useTranslation } from 'react-i18next';
 import { MoveRecordResponse } from '../api/types';
 
 /**
@@ -38,6 +36,7 @@ export function MoveHistory({
   goToMove,
   startColor = 'white',
 }: MoveHistoryProps) {
+  const { t } = useTranslation();
   // Group moves into rows handling retries and illegal moves
   const rows: HistoryRow[] = [];
   let currentNumber = 1;
@@ -94,17 +93,17 @@ export function MoveHistory({
       <div
         className="sidebar-section-header has-tooltip"
         style={{ background: 'var(--bg-app)' }}
-        data-tooltip="A complete chronological history of every move played in this game."
+        data-tooltip={t('replay.history.title')}
       >
-        Move Records
+        {t('replay.history.title')}
       </div>
       <div className="replay-sidebar-content custom-scrollbar">
         <table className="move-history-table">
           <thead>
             <tr>
               <th className="th-number">#</th>
-              <th className="th-move">White</th>
-              <th className="th-move">Black</th>
+              <th className="th-move">{t('replay.history.white', { defaultValue: 'White' })}</th>
+              <th className="th-move">{t('replay.history.black', { defaultValue: 'Black' })}</th>
             </tr>
           </thead>
           <tbody>
@@ -128,7 +127,9 @@ export function MoveHistory({
                         aria-label={`Go to move ${row.number} white ${white.move.actual_move}`}
                       >
                         {white.move.actual_move}
-                        {white.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                        {white.move.is_illegal && (
+                          <span className="illegal-tag">({t('replay.illegalMove')})</span>
+                        )}
                       </button>
                     )}
                   </td>
@@ -142,7 +143,9 @@ export function MoveHistory({
                         aria-label={`Go to move ${row.number} black ${black.move.actual_move}`}
                       >
                         {black.move.actual_move}
-                        {black.move.is_illegal && <span className="illegal-tag">(Illegal)</span>}
+                        {black.move.is_illegal && (
+                          <span className="illegal-tag">({t('replay.illegalMove')})</span>
+                        )}
                       </button>
                     )}
                   </td>

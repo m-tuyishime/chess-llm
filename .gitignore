@@ -2,10 +2,13 @@
 data/*.csv
 data/*.db
 data/*.db-*
+data/backups/
 .env
 logs/
+*.log
 
 # Python
+
 __pycache__/
 *.py[cod]
 *$py.class

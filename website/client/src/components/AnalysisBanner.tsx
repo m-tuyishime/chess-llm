@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { MoveRecordResponse } from '../api/types';
 import { parseMove, IllegalMoveAnalysis } from '../lib/chess-logic';
 
@@ -30,6 +31,7 @@ export function AnalysisBanner({
   illegalSquare,
   analysisResult,
 }: AnalysisBannerProps) {
+  const { t } = useTranslation();
   if (!currentMove) return null;
 
   const isIllegal = currentMove.is_illegal;
@@ -50,14 +52,17 @@ export function AnalysisBanner({
     if (analysisResult?.description) {
       message = analysisResult.description;
     } else if (hallucinatedSquare) {
-      message = `The agent tried to move a non-existent ${pieceType} to ${targetSq} (Hallucination).`;
+      message = t('replay.messages.hallucination', { piece: pieceType, target: targetSq });
     } else if (illegalSquare) {
-      message = `The agent tried to move ${pieceType} to ${targetSq}, but it was an illegal move.`;
+      message = t('replay.messages.illegal', { piece: pieceType, target: targetSq });
     } else {
-      message = `The agent selected an illegal move (${actualMove}).`;
+      message = t('replay.messages.genericIllegal', { move: actualMove });
     }
   } else {
-    message = `The agent played ${actualMove}, but the optimal move was ${currentMove.expected_move}.`;
+    message = t('replay.messages.incorrect', {
+      move: actualMove,
+      expected: currentMove.expected_move,
+    });
   }
 
   return (
@@ -65,9 +70,9 @@ export function AnalysisBanner({
       <div className="analysis-banner-title">
         {isIllegal
           ? analysisResult?.type === 'legal'
-            ? 'Notation Error'
-            : 'Illegal Move'
-          : 'Incorrect Move'}
+            ? t('replay.messages.notationError')
+            : t('replay.messages.illegalMove')
+          : t('replay.messages.incorrectMove')}
       </div>
       <div className="analysis-banner-message">{message}</div>
     </div>

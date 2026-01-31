@@ -1,30 +1,29 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Sun, Moon, Languages } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
-/**
- *
- */
 /**
  * Navbar component.
  * Provides main navigation, theme toggle, and language toggle.
  */
 export function Navbar() {
-  const [theme, setTheme] = React.useState<'dark' | 'light'>(
-    (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
-  );
-  const [lang, setLang] = React.useState(localStorage.getItem('lang') || 'en');
+  const { t, i18n } = useTranslation();
+  const [theme, setTheme] = useLocalStorage<'dark' | 'light'>('theme', 'dark');
+  const [lang, setLang] = useLocalStorage<string>('lang', i18n.language);
   const location = useLocation();
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Sync i18n with localStorage
   React.useEffect(() => {
-    localStorage.setItem('lang', lang);
-    // Ideally use a context or i18n lib here, but for now just persisting state
-  }, [lang]);
+    if (i18n.language !== lang) {
+      i18n.changeLanguage(lang);
+    }
+  }, [lang, i18n]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -47,7 +46,7 @@ export function Navbar() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Chess LLM Arena
+            {t('nav.title')}
           </span>
         </Link>
       </div>
@@ -56,22 +55,26 @@ export function Navbar() {
           to="/leaderboard"
           className={`nav-link ${location.pathname === '/leaderboard' ? 'active' : ''}`}
         >
-          Leaderboard
+          {t('nav.leaderboard')}
         </Link>
         <Link
           to="/analytics"
           className={`nav-link ${location.pathname === '/analytics' ? 'active' : ''}`}
         >
-          Analytics
+          {t('nav.analytics')}
         </Link>
         <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
-          About
+          {t('nav.about')}
         </Link>
         <div className="nav-actions">
-          <button className="btn btn-secondary" onClick={toggleTheme} title="Toggle Theme">
+          <button className="btn btn-secondary" onClick={toggleTheme} title={t('nav.toggleTheme')}>
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-          <button className="btn btn-secondary" onClick={toggleLang} title="Toggle Language">
+          <button
+            className="btn btn-secondary"
+            onClick={toggleLang}
+            title={t('nav.toggleLanguage')}
+          >
             <Languages size={20} />
             <span style={{ fontSize: '0.8rem', marginLeft: '0.2rem' }}>{lang.toUpperCase()}</span>
           </button>

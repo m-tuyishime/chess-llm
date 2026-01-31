@@ -6,6 +6,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { AgentRankingResponse } from '../api/types';
 
@@ -14,6 +15,7 @@ import { AgentRankingResponse } from '../api/types';
  * Displays the ranking of agents via a table.
  */
 export function Leaderboard() {
+  const { t } = useTranslation();
   const [rankings, setRankings] = useState<AgentRankingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export function Leaderboard() {
         const data = await api.getLeaderboard();
         setRankings(data);
       } catch (err) {
-        setError('Failed to fetch leaderboard');
+        setError(t('common.error') + ': Failed to fetch leaderboard');
         console.error(err);
       } finally {
         setLoading(false);
@@ -33,7 +35,7 @@ export function Leaderboard() {
     };
 
     fetchLeaderboard();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
@@ -50,7 +52,7 @@ export function Leaderboard() {
         className="card"
         style={{ textAlign: 'center', borderColor: 'var(--status-failed-text)' }}
       >
-        <p style={{ color: 'var(--status-failed-text)' }}>Error: {error}</p>
+        <p style={{ color: 'var(--status-failed-text)' }}>{error}</p>
       </div>
     );
   }
@@ -59,13 +61,13 @@ export function Leaderboard() {
     <div className="agent-detail-page">
       <div className="flex justify-between items-end">
         <div>
-          <h1>Leaderboard</h1>
+          <h1>{t('leaderboard.title')}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-            Top performing LLM Chess Agents
+            {t('leaderboard.subtitle')}
           </p>
         </div>
         <div className="badge badge-neutral" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
-          {rankings.length} Agents Active
+          {t('leaderboard.activeAgents', { count: rankings.length })}
         </div>
       </div>
 
@@ -74,12 +76,14 @@ export function Leaderboard() {
           <table className="games-table">
             <thead>
               <tr>
-                <th style={{ width: '80px', textAlign: 'center' }}>Rank</th>
-                <th>Model</th>
-                <th style={{ textAlign: 'right' }}>Rating</th>
-                <th style={{ textAlign: 'right' }}>RD</th>
-                <th style={{ width: '200px' }}>Win Rate</th>
-                <th style={{ textAlign: 'right' }}>Games</th>
+                <th style={{ width: '80px', textAlign: 'center' }}>
+                  {t('leaderboard.table.rank')}
+                </th>
+                <th>{t('leaderboard.table.model')}</th>
+                <th style={{ textAlign: 'right' }}>{t('leaderboard.table.rating')}</th>
+                <th style={{ textAlign: 'right' }}>{t('leaderboard.table.rd')}</th>
+                <th style={{ width: '200px' }}>{t('leaderboard.table.winRate')}</th>
+                <th style={{ textAlign: 'right' }}>{t('leaderboard.table.games')}</th>
               </tr>
             </thead>
             <tbody>
@@ -111,7 +115,7 @@ export function Leaderboard() {
                         {agent.name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                        Rating: {Math.round(agent.rating)}
+                        {t('leaderboard.table.rating')}: {Math.round(agent.rating)}
                       </div>
                     </td>
                     <td

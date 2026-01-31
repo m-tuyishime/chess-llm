@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import {
   AgentDetailResponse,
@@ -28,6 +29,7 @@ import { RatingTrendsChart } from '../components/charts/RatingTrendsChart';
  * Displays statistics and game history for a specific agent.
  */
 export function AgentDetail() {
+  const { t } = useTranslation();
   const params = useParams();
   const name = params['*'];
   const navigate = useNavigate();
@@ -65,7 +67,7 @@ export function AgentDetail() {
         );
         setRatingHistory(filteredTrends);
       } catch (err) {
-        setError('Failed to fetch agent details');
+        setError(t('common.error') + ': Failed to fetch agent details');
         console.error(err);
       } finally {
         setLoading(false);
@@ -73,7 +75,7 @@ export function AgentDetail() {
     };
 
     fetchData();
-  }, [name]);
+  }, [name, t]);
 
   // Derived state for filtered games
   const { filteredGames, successRate, uniquePuzzleTypes } = useMemo(() => {
@@ -98,8 +100,6 @@ export function AgentDetail() {
     });
 
     // Sort by date descending (newest first)
-    // Assuming API returns date string, simpler to just reverse if already sorted,
-    // or sort explicitly. Let's sort to be safe.
     filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return { filteredGames: filtered, successRate: rate, uniquePuzzleTypes: types };
@@ -122,10 +122,10 @@ export function AgentDetail() {
       <div className="agent-error-state">
         <div className="card error-card">
           <Activity className="error-icon" />
-          <h2>Error Loading Agent</h2>
+          <h2>{t('common.error')}</h2>
           <p>{error || 'Agent not found'}</p>
           <Link to="/leaderboard" className="btn btn-secondary">
-            <ArrowLeft size={16} /> Back to Leaderboard
+            <ArrowLeft size={16} /> {t('agentDetail.backToLeaderboard')}
           </Link>
         </div>
       </div>
@@ -138,7 +138,7 @@ export function AgentDetail() {
       <div className="nav-breadcrumb">
         <Link to="/leaderboard" className="breadcrumb-link">
           <ArrowLeft size={16} />
-          <span>Back to Leaderboard</span>
+          <span>{t('agentDetail.backToLeaderboard')}</span>
         </Link>
       </div>
 
@@ -150,12 +150,12 @@ export function AgentDetail() {
             <div className="agent-badges">
               {agent.is_reasoning && (
                 <span className="badge badge-info">
-                  <Brain size={12} /> Reasoning Model
+                  <Brain size={12} /> {t('agentDetail.isReasoning')}
                 </span>
               )}
               {agent.is_random && (
                 <span className="badge badge-warning">
-                  <Dice5 size={12} /> Random Baseline
+                  <Dice5 size={12} /> {t('agentDetail.isRandom')}
                 </span>
               )}
               <span className="badge badge-neutral">v1.0.0</span>
@@ -163,9 +163,9 @@ export function AgentDetail() {
           </div>
 
           <div className="agent-hero-stats">
-            <div className="hero-stat-label">Current Rating</div>
+            <div className="hero-stat-label">{t('agentDetail.rating')}</div>
             <div className="hero-stat-value">{Math.round(agent.rating)}</div>
-            <div className="hero-stat-sub">±{Math.round(agent.rd)} Deviation</div>
+            <div className="hero-stat-sub">±{Math.round(agent.rd)} RD</div>
           </div>
         </div>
         <div className="hero-glow-blue" />
@@ -176,21 +176,21 @@ export function AgentDetail() {
       <div className="stats-grid">
         <StatCard
           icon={<Trophy size={20} className="text-yellow" />}
-          label="Global Rating"
+          label={t('agentDetail.rating')}
           value={`${Math.round(agent.rating)}`}
-          subValue="Rank #?"
+          subValue="Glicko-2"
           color="yellow"
         />
         <StatCard
           icon={<Activity size={20} className="text-emerald" />}
-          label="Win Rate"
+          label={t('agentDetail.winRate')}
           value={`${successRate.toFixed(1)}%`}
           subValue={`${agent.games.filter((g) => !g.failed).length} wins`}
           color="emerald"
         />
         <StatCard
           icon={<Gamepad2 size={20} className="text-blue" />}
-          label="Total Games"
+          label={t('agentDetail.gamesPlayed')}
           value={agent.games.length.toLocaleString()}
           subValue="Puzzle attempts"
           color="blue"
@@ -214,7 +214,7 @@ export function AgentDetail() {
         }}
       >
         <ChartCard
-          title="Puzzle Success by Type"
+          title={t('agentDetail.performanceBreakdown')}
           description="Performance breakdown across different tactical themes"
           icon={<PieChart size={20} />}
         >
@@ -229,7 +229,7 @@ export function AgentDetail() {
 
         {ratingHistory.length > 0 && (
           <ChartCard
-            title="Rating History"
+            title={t('analytics.charts.ratingTrends.title')}
             description="Progression of Glicko-2 rating over time"
             icon={<TrendingUp size={20} />}
           >
@@ -243,7 +243,7 @@ export function AgentDetail() {
       <div className="card games-section">
         <div className="games-header">
           <div className="games-title-group">
-            <h3>Game History</h3>
+            <h3>{t('agentDetail.gameHistory')}</h3>
             <span className="count-badge">{filteredGames.length}</span>
           </div>
 
@@ -258,7 +258,7 @@ export function AgentDetail() {
                 }}
                 aria-label="Filter by puzzle type"
               >
-                <option value="ALL">All Types</option>
+                <option value="ALL">{t('agentDetail.filters.allTypes')}</option>
                 {uniquePuzzleTypes.map((type) => (
                   <option key={type} value={type}>
                     {type}
@@ -270,18 +270,18 @@ export function AgentDetail() {
             <FilterBtn
               active={filter === 'ALL'}
               onClick={() => handleFilterChange('ALL')}
-              label="All Games"
+              label={t('agentDetail.filters.allOutcomes')}
             />
             <FilterBtn
               active={filter === 'SUCCESS'}
               onClick={() => handleFilterChange('SUCCESS')}
-              label="Solved"
+              label={t('agentDetail.filters.success')}
               icon={<Check size={12} />}
             />
             <FilterBtn
               active={filter === 'FAILED'}
               onClick={() => handleFilterChange('FAILED')}
-              label="Failed"
+              label={t('agentDetail.filters.failed')}
               icon={<X size={12} />}
             />
           </div>
@@ -291,11 +291,11 @@ export function AgentDetail() {
           <table className="games-table">
             <thead>
               <tr>
-                <th className="col-result">Result</th>
-                <th className="col-date">Date</th>
-                <th className="col-type">Type</th>
-                <th className="col-puzzle">Puzzle ID</th>
-                <th className="col-moves">Moves</th>
+                <th className="col-result">{t('agentDetail.table.outcome')}</th>
+                <th className="col-date">{t('agentDetail.table.date')}</th>
+                <th className="col-type">{t('agentDetail.table.type')}</th>
+                <th className="col-puzzle">{t('agentDetail.table.puzzle')}</th>
+                <th className="col-moves">{t('agentDetail.table.moves')}</th>
               </tr>
             </thead>
             <tbody>
@@ -309,11 +309,11 @@ export function AgentDetail() {
                     <td>
                       {game.failed ? (
                         <span className="status-badge status-failed">
-                          <X size={12} strokeWidth={3} /> Failed
+                          <X size={12} strokeWidth={3} /> {t('agentDetail.filters.failed')}
                         </span>
                       ) : (
                         <span className="status-badge status-solved">
-                          <Check size={12} strokeWidth={3} /> Solved
+                          <Check size={12} strokeWidth={3} /> {t('agentDetail.filters.success')}
                         </span>
                       )}
                     </td>
@@ -341,7 +341,7 @@ export function AgentDetail() {
                 <tr>
                   <td colSpan={5} className="empty-state">
                     <Hash className="empty-icon" />
-                    <p>No games found matching filter.</p>
+                    <p>{t('common.noData')}</p>
                   </td>
                 </tr>
               )}
@@ -362,14 +362,14 @@ export function AgentDetail() {
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
-                Previous
+                {t('replay.controls.prev')}
               </button>
               <button
                 className="btn btn-sm btn-outline"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               >
-                Next
+                {t('replay.controls.next')}
               </button>
             </div>
           </div>
