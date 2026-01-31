@@ -8,15 +8,7 @@
   ],
   "functions": {
     "api/index.py": {
-      "includeFiles": [
-        "data/storage.db",
-        "website/**/*.py",
-        "chess_llm_eval/**/*.py"
-      ],
-      "excludeFiles": [
-        "**/__pycache__/**",
-        "**/*.pyc"
-      ]
+      "includeFiles": "data/storage.db"
     }
   },
   "env": {
