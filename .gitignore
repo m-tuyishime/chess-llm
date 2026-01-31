@@ -51,3 +51,4 @@ node_modules/
 dist/
 .env.local
 .eslintcache
+# Generated JSON data file for serverless deployment\ndata.json

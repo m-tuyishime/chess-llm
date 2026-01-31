@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pip install -r requirements-server.txt && python build.py && npm run build",
   "outputDirectory": "website/client/dist",
   "rewrites": [
     {
@@ -8,10 +10,26 @@
   ],
   "functions": {
     "api/index.py": {
-      "includeFiles": "data/storage.db"
+      "includeFiles": "data.json",
+      "excludeFiles": [
+        "data/storage.db",
+        "tests/**",
+        "scripts/**",
+        "**/__pycache__/**",
+        "**/*.pyc",
+        "**/*.pyo",
+        "**/*.test.py",
+        "pytest.ini",
+        "pyproject.toml",
+        "requirements.txt",
+        "uv.lock",
+        "website/client/**/*.test.ts",
+        "website/client/**/*.test.tsx"
+      ]
     }
   },
   "env": {
-    "CHESS_DB_IMMUTABLE": "true"
+    "CHESS_REPO_TYPE": "json",
+    "CHESS_JSON_PATH": "data.json"
   }
 }
