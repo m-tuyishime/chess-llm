@@ -560,11 +560,14 @@ class SQLiteRepository:
 
     def get_final_ratings_data(self) -> pd.DataFrame:
         """
-        Get each agent's most recent rating and rating deviation from the agent table.
+        Get each agent's most recent rating and rating deviation using the cached values
+        in the agent table (maintained by save_benchmark).
         Returns columns: agent_name, agent_rating, agent_deviation.
         """
         query = """
-            SELECT name AS agent_name,
+            SELECT
+                name AS agent_name,
+
                 rating AS agent_rating,
                 rd AS agent_deviation
             FROM agent
