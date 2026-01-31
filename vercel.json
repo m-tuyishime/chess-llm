@@ -5,5 +5,13 @@
       "source": "/api/(.*)",
       "destination": "/api/index.py"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "data/storage.db"
+    }
+  },
+  "env": {
+    "CHESS_DB_IMMUTABLE": "true"
+  }
 }
