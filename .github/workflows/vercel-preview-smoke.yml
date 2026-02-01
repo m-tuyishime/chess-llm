@@ -35,21 +35,22 @@ jobs:
               "/api/analytics/agents/meta%2Fllama-3.1-405b-instruct",
           ]
 
-          def fetch(url, attempts=12, delay=5):
+          def fetch(request, attempts=12, delay=5):
               last_err = None
               for _ in range(attempts):
                   try:
-                      with urllib.request.urlopen(url, timeout=10) as resp:
+                      with urllib.request.urlopen(request, timeout=10) as resp:
                           body = resp.read().decode("utf-8")
                           return resp.status, body
                   except Exception as err:
                       last_err = err
                       time.sleep(delay)
-              raise RuntimeError(f"Failed to fetch {url}: {last_err}")
+              raise RuntimeError(f"Failed to fetch {request.full_url}: {last_err}")
 
           for path in endpoints:
               url = f"{base}{path}"
-              status, body = fetch(url)
+              req = urllib.request.Request(url, headers={"User-Agent": "vercel-preview-smoke"})
+              status, body = fetch(req)
               if status != 200:
                   raise SystemExit(f"{url} returned {status}")
               if path == "/health":
