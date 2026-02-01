@@ -1,5 +1,6 @@
 import time
 from typing import Annotated, Any, cast
+from urllib.parse import unquote
 
 import pandas as pd
 from fastapi import Depends, FastAPI, HTTPException
@@ -182,7 +183,7 @@ async def get_agent_detail(
     name: str, repository: Annotated[GameRepository, Depends(get_repository)]
 ) -> AgentDetailResponse:
     """Get detailed statistics for a specific agent."""
-    normalized = name.strip()
+    normalized = unquote(name).strip()
     agent = repository.get_agent(normalized)
     if not agent:
         # Attempt case-insensitive fallback
