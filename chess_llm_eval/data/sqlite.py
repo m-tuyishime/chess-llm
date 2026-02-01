@@ -1,5 +1,6 @@
 import contextlib
 import logging
+import os
 import sqlite3
 from datetime import datetime
 from typing import Any
@@ -17,11 +18,23 @@ logger = logging.getLogger(__name__)
 class SQLiteRepository:
     """SQLite implementation of GameRepository."""
 
-    def __init__(self, db_path: str = "data/storage.db"):
+    def __init__(self, db_path: str = "data/storage.db", immutable: bool = False):
         self.db_path = db_path
-        self.conn = sqlite3.connect(db_path, check_same_thread=False)
-        self.conn.row_factory = sqlite3.Row
-        self._create_tables()
+        self.immutable = immutable
+
+        if immutable:
+            # Use immutable mode for read-only filesystems (e.g., Vercel)
+            # This skips all locking/journaling for maximum performance
+            absolute_path = os.path.abspath(db_path)
+            uri = f"file:{absolute_path}?immutable=1"
+            logger.debug(f"Opening database in immutable mode: {uri}")
+            self.conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
+            self.conn.row_factory = sqlite3.Row
+            # Skip table creation in immutable mode - database is pre-populated
+        else:
+            self.conn = sqlite3.connect(db_path, check_same_thread=False)
+            self.conn.row_factory = sqlite3.Row
+            self._create_tables()
 
     def _create_tables(self) -> None:
         cursor = self.conn.cursor()

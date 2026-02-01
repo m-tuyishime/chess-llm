@@ -1,0 +1,19 @@
+# Production requirements for Vercel deployment
+# This is a minimal set optimized for serverless deployment
+# For development, use requirements.txt which includes all dependencies
+
+# Web framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+
+# Data processing (needed for analytics endpoints)
+pandas>=2.0.0
+
+# Note: The following are NOT needed for production read-only server:
+# - python-chess (only for evaluation pipeline)
+# - glicko2 (only for rating calculations during evaluation)
+# - matplotlib (only for report generation)
+# - numpy (only for report generation)
+# - aiolimiter (only for API rate limiting)
+# - openai (only for LLM API calls)
