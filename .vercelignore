@@ -44,7 +44,6 @@ LICENSE
 .idea/
 
 # Database (we use JSON in production)
-data/storage.db
 data/backups/
 
 # Generated files
