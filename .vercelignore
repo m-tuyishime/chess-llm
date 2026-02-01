@@ -1,0 +1,51 @@
+# Vercel ignore file - files to exclude from serverless functions
+# These are excluded at build time, reducing bundle size
+
+# Test files
+tests/
+**/*.test.py
+**/*.test.ts
+**/*.test.tsx
+pytest.ini
+
+# Build scripts and dev tools
+scripts/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env*
+.venv/
+
+# Config files not needed in production
+pyproject.toml
+uv.lock
+requirements.txt  # We use requirements-server.txt instead
+
+# Documentation
+*.md
+LICENSE
+
+# IDE and git
+.git/
+.github/
+.vscode/
+.idea/
+
+# Database (we use JSON in production)
+data/storage.db
+data/backups/
+
+# Generated files
+data.json  # Generated during build, should not be committed

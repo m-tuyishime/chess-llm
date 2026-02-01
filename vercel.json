@@ -11,7 +11,7 @@
   "functions": {
     "api/index.py": {
       "includeFiles": "data.json",
-      "excludeFiles": "{tests/**,scripts/**,__pycache__/**,*.pyc,*.pyo,*.test.py,pytest.ini,pyproject.toml,uv.lock,website/client/**/*.test.ts,website/client/**/*.test.tsx,data/storage.db}"
+      "excludeFiles": "data/storage.db"
     }
   },
   "env": {
