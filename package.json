@@ -14,7 +14,9 @@
     "dev:client": "npm run dev --prefix website/client",
     "build": "npm install --prefix website/client && npm run build --prefix website/client",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "vercel-build": "npm run build:vercel",
+    "build:vercel": "uv pip install --system --link-mode=copy -r requirements-server.txt && python build.py && npm install --prefix website/client && npm run build --prefix website/client"
   },
   "repository": {
     "type": "git",
