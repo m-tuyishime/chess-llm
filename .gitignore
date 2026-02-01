@@ -51,4 +51,9 @@ node_modules/
 dist/
 .env.local
 .eslintcache
-# Generated JSON data file for serverless deployment\ndata.json
+# Generated JSON data file for serverless deployment
+data.json
+.vercel
+.vercel_python_packages/
+.env*.local
+nul

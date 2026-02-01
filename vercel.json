@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "UV_LINK_MODE=copy uv pip install --system -r requirements-server.txt && python build.py && npm run build",
+  "buildCommand": "uv pip install --system --link-mode=copy -r requirements-server.txt && python build.py && npm run build",
   "outputDirectory": "website/client/dist",
   "rewrites": [
     {
@@ -16,7 +16,6 @@
   },
   "env": {
     "CHESS_REPO_TYPE": "json",
-    "CHESS_JSON_PATH": "data.json",
-    "UV_LINK_MODE": "copy"
+    "CHESS_JSON_PATH": "data.json"
   }
 }
