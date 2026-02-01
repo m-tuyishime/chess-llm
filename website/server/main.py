@@ -59,6 +59,18 @@ async def get_leaderboard(
     return [AgentRankingResponse.model_validate(r) for r in repository.get_leaderboard()]
 
 
+@app.get("/api/debug/agents")
+async def get_agent_names(
+    repository: Annotated[GameRepository, Depends(get_repository)],
+) -> dict[str, list[str]]:
+    """Debug: return list of agent names.
+
+    This endpoint is useful to verify what agent names are stored in the
+    repository in production. Remove if not needed.
+    """
+    return {"agents": [agent.name for agent in repository.get_all_agents()]}
+
+
 @app.get("/api/analytics", response_model=AnalyticsResponse)
 async def get_analytics(
     repository: Annotated[GameRepository, Depends(get_repository)],
@@ -170,11 +182,20 @@ async def get_agent_detail(
     name: str, repository: Annotated[GameRepository, Depends(get_repository)]
 ) -> AgentDetailResponse:
     """Get detailed statistics for a specific agent."""
-    agent = repository.get_agent(name)
+    normalized = name.strip()
+    agent = repository.get_agent(normalized)
+    if not agent:
+        # Attempt case-insensitive fallback
+        for candidate in repository.get_all_agents():
+            if candidate.name.lower() == normalized.lower():
+                agent = candidate
+                normalized = candidate.name
+                break
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    games = repository.get_agent_games(name)
+    games = repository.get_agent_games(normalized)
 
     return AgentDetailResponse(
         name=agent.name,
