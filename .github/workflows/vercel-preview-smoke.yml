@@ -11,6 +11,7 @@ jobs:
       - name: Validate preview endpoints
         env:
           BASE_URL: ${{ github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           set -euo pipefail
 
@@ -27,6 +28,7 @@ jobs:
           import urllib.request
 
           base = os.environ["BASE_URL"].rstrip("/")
+          bypass = os.environ.get("VERCEL_AUTOMATION_BYPASS_SECRET")
 
           endpoints = [
               "/health",
@@ -49,7 +51,10 @@ jobs:
 
           for path in endpoints:
               url = f"{base}{path}"
-              req = urllib.request.Request(url, headers={"User-Agent": "vercel-preview-smoke"})
+              headers = {"User-Agent": "vercel-preview-smoke"}
+              if bypass:
+                  headers["x-vercel-protection-bypass"] = bypass
+              req = urllib.request.Request(url, headers=headers)
               status, body = fetch(req)
               if status != 200:
                   raise SystemExit(f"{url} returned {status}")
