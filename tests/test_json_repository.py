@@ -4,12 +4,26 @@ These tests verify that the JSON repository produces identical results
 to the SQLite repository, ensuring no data loss during conversion.
 """
 
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from chess_llm_eval.data.json_repo import JSONRepository
 from chess_llm_eval.data.sqlite import SQLiteRepository
+
+
+def ensure_json_data() -> None:
+    """Ensure data.json exists, generate it if needed."""
+    if not Path("data.json").exists():
+        subprocess.run([sys.executable, "build.py"], check=True)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _generate_json_data() -> None:
+    """Generate data.json before running any tests in this module."""
+    ensure_json_data()
 
 
 class TestDataIntegrity:
@@ -21,7 +35,7 @@ class TestDataIntegrity:
         return SQLiteRepository(db_path="data/storage.db", immutable=True)
 
     @pytest.fixture(scope="module")
-    def json_repo(self) -> JSONRepository:
+    def json_repo(self, _generate_json_data: None) -> JSONRepository:
         """Provide JSON repository for comparison."""
         return JSONRepository(json_path="data.json")
 
