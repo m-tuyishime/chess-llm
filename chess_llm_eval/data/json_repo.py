@@ -6,6 +6,7 @@ designed for Vercel serverless functions where SQLite is problematic.
 
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -56,6 +57,9 @@ class JSONRepository(GameRepository):
         self.games_df = pd.DataFrame(data["game"])
         self.moves_df = pd.DataFrame(data["move"])
         self.benchmarks_df = pd.DataFrame(data["benchmark"])
+
+        if "failed" in self.games_df.columns:
+            self.games_df["failed"] = self.games_df["failed"].fillna(0).astype(bool)
 
         # Pre-computed analytics (optional, for better performance)
         self.analytics = data.get("analytics", {})
@@ -223,9 +227,33 @@ class JSONRepository(GameRepository):
 
         game = game_row.iloc[0].to_dict()
 
+        puzzle_type = ""
+        puzzle_match = self.puzzles_df[self.puzzles_df["id"] == game.get("puzzle_id")]
+        if not puzzle_match.empty:
+            puzzle_type = puzzle_match.iloc[0]["type"]
+
+        game["puzzle_type"] = puzzle_type
+        game["failed"] = bool(game.get("failed", False))
+
+        if "date" in game:
+            game["date"] = self._parse_datetime(game["date"])
+
         # Get moves for this game
         moves = self.moves_df[self.moves_df["game_id"] == game_id]
-        game["moves"] = [MoveRecord(**row) for _, row in moves.iterrows()]
+        game["moves"] = [
+            MoveRecord(
+                id=row.get("id"),
+                game_id=row.get("game_id"),
+                fen=str(row.get("fen") or ""),
+                expected_move=str(row.get("correct_move") or ""),
+                actual_move=str(row.get("move") or ""),
+                is_illegal=bool(row.get("illegal_move", False)),
+                prompt_tokens=row.get("prompt_tokens", 0) or 0,
+                completion_tokens=row.get("completion_tokens", 0) or 0,
+            )
+            for _, row in moves.iterrows()
+        ]
+        game["move_count"] = len(game["moves"])
 
         return Game(**game)  # type: ignore[misc]
 
@@ -238,8 +266,53 @@ class JSONRepository(GameRepository):
         Returns:
             List of Game objects.
         """
-        games = self.games_df[self.games_df["agent_name"] == agent_name]
-        return [Game(**row) for _, row in games.iterrows()]
+        games = self.games_df[self.games_df["agent_name"] == agent_name].copy()
+        if games.empty:
+            return []
+
+        games = games.merge(
+            self.puzzles_df[["id", "type"]],
+            left_on="puzzle_id",
+            right_on="id",
+            how="left",
+        )
+        games = games.rename(columns={"type": "puzzle_type"})
+
+        move_counts = (
+            self.moves_df.groupby("game_id")["id"].count().rename("move_count")
+        )
+        games = games.merge(move_counts, left_on="id_x", right_on="game_id", how="left")
+        games["move_count"] = games["move_count"].fillna(0).astype(int)
+        games["failed"] = games["failed"].fillna(0).astype(bool)
+
+        if "date" in games.columns:
+            games["date"] = games["date"].apply(self._parse_datetime)
+
+        return [
+            Game(
+                id=row["id_x"],
+                puzzle_id=row["puzzle_id"],
+                puzzle_type=row.get("puzzle_type", ""),
+                agent_name=row["agent_name"],
+                failed=bool(row["failed"]),
+                date=row["date"],
+                moves=[],
+                move_count=int(row["move_count"]),
+            )
+            for _, row in games.iterrows()
+        ]
+
+    @staticmethod
+    def _parse_datetime(value: object) -> datetime:
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            date_str = value.replace(" ", "T")
+            try:
+                return datetime.fromisoformat(date_str)
+            except ValueError:
+                return datetime.now()
+        return datetime.now()
 
     def get_leaderboard(self) -> list[AgentRanking]:
         """Get leaderboard data.

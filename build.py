@@ -91,10 +91,8 @@ def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
             a.rd,
             COUNT(g.id) as games_played,
             SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) as wins,
-            ROUND(
-                100.0 * SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) / COUNT(g.id),
-                2
-            ) as win_rate
+            1.0 * SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) / COUNT(g.id)
+            as win_rate
         FROM agent a
         LEFT JOIN game g ON a.name = g.agent_name
         GROUP BY a.name
