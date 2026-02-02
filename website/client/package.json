@@ -36,6 +36,7 @@
     "vitest": "^4.0.17"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "chart.js": "^4.4.1",
     "chess.js": "^1.4.0",
     "i18next": "^25.8.0",

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { Navbar } from './components/Navbar';
 import { Leaderboard } from './pages/Leaderboard';
 import { AgentDetail } from './pages/AgentDetail';
@@ -51,6 +52,7 @@ function App() {
   return (
     <Router>
       <AppLayout />
+      <VercelAnalytics />
     </Router>
   );
 }
