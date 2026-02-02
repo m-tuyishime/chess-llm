@@ -301,6 +301,49 @@ export function ReplayPage() {
                     </div>
                   </div>
 
+                  <div className="puzzle-stat-row">
+                    <div>
+                      <div className="stat-label">Type</div>
+                      <div className="stat-value">{puzzle.type || '—'}</div>
+                    </div>
+                    <div className="puzzle-stat-right">
+                      <div className="stat-label">Plays</div>
+                      <div className="stat-value">{puzzle.nb_plays?.toLocaleString() ?? '—'}</div>
+                    </div>
+                  </div>
+
+                  {puzzle.themes && (
+                    <div>
+                      <div className="stat-label">Themes</div>
+                      <div className="puzzle-tags">
+                        {puzzle.themes
+                          .split(/[,\s]+/)
+                          .filter(Boolean)
+                          .map((theme) => (
+                            <span key={theme} className="puzzle-tag">
+                              {theme}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {puzzle.opening_tags && (
+                    <div>
+                      <div className="stat-label">Opening Tags</div>
+                      <div className="puzzle-tags">
+                        {puzzle.opening_tags
+                          .split(/[,\s]+/)
+                          .filter(Boolean)
+                          .map((tag) => (
+                            <span key={tag} className="puzzle-tag puzzle-tag-muted">
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="puzzle-id-box">
                     <div>
                       <div className="stat-label stat-label-sm">{t('replay.puzzleId')}</div>

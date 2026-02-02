@@ -233,7 +233,7 @@ export function AgentDetail() {
             description="Progression of Glicko-2 rating over time"
             icon={<TrendingUp size={20} />}
           >
-            <RatingTrendsChart data={ratingHistory} />
+            <RatingTrendsChart data={ratingHistory} showConfidence />
           </ChartCard>
         )}
       </div>
