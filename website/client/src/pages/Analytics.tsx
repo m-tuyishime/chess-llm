@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { AnalyticsResponse } from '../api/types';
 import { ChartCard } from '../components/ChartCard';
+import { ChartErrorBoundary } from '../components/ChartErrorBoundary';
 import { RatingTrendsChart } from '../components/charts/RatingTrendsChart';
 import { RatingDeviationChart } from '../components/charts/RatingDeviationChart';
 import { FinalRatingsIntervalsChart } from '../components/charts/FinalRatingsIntervalsChart';
@@ -79,7 +80,9 @@ export function Analytics() {
           description={t('analytics.charts.ratingTrends.desc')}
           icon={<TrendingUp size={20} />}
         >
-          <RatingTrendsChart data={data.rating_trends} />
+          <ChartErrorBoundary title={t('analytics.charts.ratingTrends.title')}>
+            <RatingTrendsChart data={data.rating_trends} />
+          </ChartErrorBoundary>
         </ChartCard>
 
         <ChartCard
@@ -87,7 +90,9 @@ export function Analytics() {
           description={t('analytics.charts.ratingDeviation.desc')}
           icon={<Activity size={20} />}
         >
-          <RatingDeviationChart data={data.rating_trends} />
+          <ChartErrorBoundary title={t('analytics.charts.ratingDeviation.title')}>
+            <RatingDeviationChart data={data.rating_trends} />
+          </ChartErrorBoundary>
         </ChartCard>
 
         <ChartCard
@@ -95,7 +100,9 @@ export function Analytics() {
           description={t('analytics.charts.illegalMoves.desc')}
           icon={<AlertTriangle size={20} />}
         >
-          <IllegalMovesChart data={data.illegal_moves} />
+          <ChartErrorBoundary title={t('analytics.charts.illegalMoves.title')}>
+            <IllegalMovesChart data={data.illegal_moves} />
+          </ChartErrorBoundary>
         </ChartCard>
 
         <ChartCard
@@ -103,7 +110,9 @@ export function Analytics() {
           description={t('analytics.charts.puzzleOutcomes.desc')}
           icon={<PieChart size={20} />}
         >
-          <PuzzleOutcomesChart data={data.puzzle_outcomes} />
+          <ChartErrorBoundary title={t('analytics.charts.puzzleOutcomes.title')}>
+            <PuzzleOutcomesChart data={data.puzzle_outcomes} />
+          </ChartErrorBoundary>
         </ChartCard>
 
         <ChartCard
@@ -111,7 +120,9 @@ export function Analytics() {
           description={t('analytics.charts.tokenEfficiency.desc')}
           icon={<Zap size={20} />}
         >
-          <TokenUsageChart data={data.token_usage} />
+          <ChartErrorBoundary title={t('analytics.charts.tokenEfficiency.title')}>
+            <TokenUsageChart data={data.token_usage} />
+          </ChartErrorBoundary>
         </ChartCard>
 
         <ChartCard
@@ -120,11 +131,13 @@ export function Analytics() {
           icon={<Target size={20} />}
           minHeight="600px"
         >
-          <FinalRatingsIntervalsChart
-            data={data.final_ratings}
-            weightedRating={data.weighted_puzzle_rating}
-            weightedDeviation={data.weighted_puzzle_deviation}
-          />
+          <ChartErrorBoundary title={t('analytics.charts.finalRatings.title')}>
+            <FinalRatingsIntervalsChart
+              data={data.final_ratings}
+              weightedRating={data.weighted_puzzle_rating}
+              weightedDeviation={data.weighted_puzzle_deviation}
+            />
+          </ChartErrorBoundary>
         </ChartCard>
       </div>
     </div>
