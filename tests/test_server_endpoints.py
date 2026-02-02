@@ -92,7 +92,7 @@ class MockRepository:
         return None
 
     def get_agent(self, name: str) -> AgentData | None:
-        if name == "TestAgent":
+        if name in {"TestAgent", "Test/Agent"}:
             return MOCK_AGENT
         return None
 
@@ -107,7 +107,7 @@ class MockRepository:
         return None
 
     def get_agent_games(self, agent_name: str) -> list[Game]:
-        if agent_name == "TestAgent":
+        if agent_name in {"TestAgent", "Test/Agent"}:
             return [MOCK_GAME]
         return []
 
@@ -167,6 +167,20 @@ def test_get_agent_detail(client: TestClient) -> None:
     # Check that games list is present
     # (MockRepository.get_agent_games needs to represent this if main.py calls it)
     assert "games" in data
+
+
+def test_get_agent_detail_with_encoded_name(client: TestClient) -> None:
+    """
+    Test agent detail with encoded name containing slashes.
+
+    Why:
+        Real agent names include slashes and are URL-encoded by the frontend.
+        The API should decode and resolve them correctly.
+    """
+    response = client.get("/api/agents/Test%2FAgent")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "TestAgent"
 
 
 def test_get_agent_not_found(client: TestClient) -> None:

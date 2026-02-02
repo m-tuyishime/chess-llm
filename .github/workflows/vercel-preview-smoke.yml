@@ -1,0 +1,67 @@
+name: Vercel Preview Smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  preview-smoke:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate preview endpoints
+        env:
+          BASE_URL: ${{ github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${BASE_URL}" ]; then
+            echo "Missing deployment_status.target_url"
+            exit 1
+          fi
+
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+
+          base = os.environ["BASE_URL"].rstrip("/")
+          bypass = os.environ.get("VERCEL_AUTOMATION_BYPASS_SECRET")
+
+          endpoints = [
+              "/health",
+              "/api/leaderboard",
+              "/api/agents/meta%2Fllama-3.1-405b-instruct",
+              "/api/analytics/agents/meta%2Fllama-3.1-405b-instruct",
+          ]
+
+          def fetch(request, attempts=12, delay=5):
+              last_err = None
+              for _ in range(attempts):
+                  try:
+                      with urllib.request.urlopen(request, timeout=10) as resp:
+                          body = resp.read().decode("utf-8")
+                          return resp.status, body
+                  except Exception as err:
+                      last_err = err
+                      time.sleep(delay)
+              raise RuntimeError(f"Failed to fetch {request.full_url}: {last_err}")
+
+          for path in endpoints:
+              url = f"{base}{path}"
+              headers = {"User-Agent": "vercel-preview-smoke"}
+              if bypass:
+                  headers["x-vercel-protection-bypass"] = bypass
+              req = urllib.request.Request(url, headers=headers)
+              status, body = fetch(req)
+              if status != 200:
+                  raise SystemExit(f"{url} returned {status}")
+              if path == "/health":
+                  data = json.loads(body)
+                  if data.get("status") != "ok":
+                      raise SystemExit(f"Health payload invalid: {data}")
+
+          print("Preview smoke checks passed.")
+          PY

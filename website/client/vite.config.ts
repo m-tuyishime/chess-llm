@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 800,
+  },
   // @ts-expect-error - vitest config integration
   test: {
     globals: true,

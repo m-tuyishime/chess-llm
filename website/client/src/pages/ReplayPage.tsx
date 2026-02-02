@@ -12,6 +12,53 @@ import { MoveHistory } from '../components/MoveHistory';
 import { BoardArrows } from '../components/BoardArrows';
 import './ReplayPage.css';
 
+const PUZZLE_TYPE_TOOLTIPS: Record<string, string> = {
+  mate: 'Find a forced checkmate sequence.',
+  advantage: 'Win material or obtain a decisive advantage.',
+  equality: 'Hold or restore an equal position.',
+  tactic: 'Find a tactical shot that gains material or delivers mate.',
+  strategy: 'Find a strong positional plan or long-term advantage.',
+};
+
+const THEME_TOOLTIPS: Record<string, string> = {
+  fork: 'A single move attacks two or more pieces at once.',
+  pin: 'A piece cannot move because it would expose a more valuable piece.',
+  skewer: 'Attack a valuable piece so it must move, exposing a lesser piece.',
+  discoveredattack: 'Move a piece to reveal an attack from another piece.',
+  doubleattack: 'A move that creates two simultaneous threats.',
+  sacrifice: 'Give up material for a tactical gain.',
+  attraction: 'Lure a piece to a vulnerable square.',
+  deflection: 'Force a defender away from a key square or piece.',
+  clearance: 'Clear a square or file to enable a tactic.',
+  interference: 'Block a line between a piece and its target.',
+  advantage: 'Gain a winning or near-winning position.',
+  equality: 'Hold or restore a roughly equal position.',
+  tactic: 'A short tactical sequence to win material or mate.',
+  strategy: 'A longer-term plan to improve position or structure.',
+  backrankmate: 'Checkmate along the back rank with blocked escape squares.',
+  smotheredmate: 'Checkmate where the king is blocked by its own pieces.',
+  mate: 'A forced checkmate motif.',
+  matein1: 'Checkmate in one move.',
+  matein2: 'Checkmate in two moves.',
+  matein3: 'Checkmate in three moves.',
+  perpetualcheck: 'Force a draw by repeated checking.',
+  zugzwang: 'Any move worsens the position.',
+  endgame: 'Puzzle occurs in an endgame position.',
+  middlegame: 'Puzzle occurs in a middlegame position.',
+  opening: 'Puzzle occurs in the opening phase.',
+};
+
+const getPuzzleTypeTooltip = (type?: string) => {
+  if (!type) return 'Puzzle category from Lichess.';
+  const key = type.toLowerCase();
+  return PUZZLE_TYPE_TOOLTIPS[key] || 'Puzzle category from Lichess.';
+};
+
+const getThemeTooltip = (theme: string) => {
+  const key = theme.toLowerCase();
+  return THEME_TOOLTIPS[key] || 'Tactical motif or strategic idea tagged by Lichess.';
+};
+
 /**
  * Page component for replaying a chess game/puzzle.
  * Handles fetching game data, maintaining state, and rendering the board and controls.
@@ -292,18 +339,109 @@ export function ReplayPage() {
                 <div className="puzzle-meta">
                   <div className="puzzle-stat-row">
                     <div>
-                      <div className="stat-label">{t('leaderboard.table.rating')}</div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Puzzle rating (Glicko-2) based on solver performance."
+                      >
+                        {t('leaderboard.table.rating')}
+                      </div>
                       <div className="stat-value">{puzzle.rating}</div>
                     </div>
                     <div className="puzzle-stat-right">
-                      <div className="stat-label">Popularity</div>
+                      <div
+                        className="stat-label has-tooltip tooltip-right"
+                        data-tooltip="Popularity ranges from 100 to -100 and reflects weighted upvotes/downvotes."
+                      >
+                        Popularity
+                      </div>
                       <div className="stat-value">{puzzle.popularity}%</div>
                     </div>
                   </div>
 
+                  <div className="puzzle-stat-row">
+                    <div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Puzzle category from Lichess (e.g., mate, advantage, equality)."
+                      >
+                        Type
+                      </div>
+                      <div
+                        className="stat-value has-tooltip"
+                        data-tooltip={getPuzzleTypeTooltip(puzzle.type)}
+                      >
+                        {puzzle.type || '—'}
+                      </div>
+                    </div>
+                    <div className="puzzle-stat-right">
+                      <div
+                        className="stat-label has-tooltip tooltip-right"
+                        data-tooltip="Number of times this puzzle was played on Lichess."
+                      >
+                        Plays
+                      </div>
+                      <div className="stat-value">{puzzle.nb_plays?.toLocaleString() ?? '—'}</div>
+                    </div>
+                  </div>
+
+                  {puzzle.themes && (
+                    <div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Tactical motifs tagged by Lichess (e.g., fork, pin, skewer)."
+                      >
+                        Themes
+                      </div>
+                      <div className="puzzle-tags">
+                        {puzzle.themes
+                          .split(/[\s,]+/)
+                          .filter(Boolean)
+                          .map((theme) => (
+                            <span
+                              key={theme}
+                              className="puzzle-tag has-tooltip"
+                              data-tooltip={getThemeTooltip(theme)}
+                            >
+                              {theme}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {puzzle.opening_tags && (
+                    <div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Opening tags are provided when the puzzle starts before move 20."
+                      >
+                        Opening Tags
+                      </div>
+                      <div className="puzzle-tags">
+                        {puzzle.opening_tags
+                          .split(/[,\s]+/)
+                          .filter(Boolean)
+                          .map((tag) => (
+                            <span
+                              key={tag}
+                              className="puzzle-tag puzzle-tag-muted has-tooltip"
+                              data-tooltip="Opening classification tag from Lichess."
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="puzzle-id-box">
                     <div>
-                      <div className="stat-label stat-label-sm">{t('replay.puzzleId')}</div>
+                      <div
+                        className="stat-label stat-label-sm has-tooltip"
+                        data-tooltip="Unique Lichess puzzle identifier."
+                      >
+                        {t('replay.puzzleId')}
+                      </div>
                       <div className="stat-value puzzle-id-value">{puzzle.id}</div>
                     </div>
                     <a
