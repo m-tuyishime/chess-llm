@@ -93,7 +93,7 @@ export function MoveHistory({
       <div
         className="sidebar-section-header has-tooltip"
         style={{ background: 'var(--bg-app)' }}
-        data-tooltip={t('replay.history.title')}
+        data-tooltip="Chronological move list for this attempt. Click a move to jump to it."
       >
         {t('replay.history.title')}
       </div>

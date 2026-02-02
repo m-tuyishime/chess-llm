@@ -303,18 +303,33 @@ export function ReplayPage() {
 
                   <div className="puzzle-stat-row">
                     <div>
-                      <div className="stat-label">Type</div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Puzzle category from Lichess (e.g., mate, advantage)."
+                      >
+                        Type
+                      </div>
                       <div className="stat-value">{puzzle.type || '—'}</div>
                     </div>
                     <div className="puzzle-stat-right">
-                      <div className="stat-label">Plays</div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Number of times this puzzle was played on Lichess."
+                      >
+                        Plays
+                      </div>
                       <div className="stat-value">{puzzle.nb_plays?.toLocaleString() ?? '—'}</div>
                     </div>
                   </div>
 
                   {puzzle.themes && (
                     <div>
-                      <div className="stat-label">Themes</div>
+                      <div
+                        className="stat-label has-tooltip"
+                        data-tooltip="Tactical motifs tagged by Lichess (e.g., fork, pin, skewer)."
+                      >
+                        Themes
+                      </div>
                       <div className="puzzle-tags">
                         {puzzle.themes
                           .split(/[,\s]+/)
