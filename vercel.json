@@ -14,6 +14,7 @@
   ],
   "functions": {
     "api/index.py": {
+      "runtime": "python3.12",
       "includeFiles": "data.json",
       "excludeFiles": "data/storage.db"
     }
