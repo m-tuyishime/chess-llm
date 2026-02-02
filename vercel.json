@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "uv pip install --system --link-mode=copy -r requirements.txt && npm run build:vercel",
+  "buildCommand": "python -m pip install -r requirements.txt && npm run build:vercel",
   "outputDirectory": "website/client/dist",
   "rewrites": [
     {
