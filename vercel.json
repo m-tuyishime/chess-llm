@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python -m pip install --break-system-packages -r requirements.txt && npm run build:vercel",
+  "installCommand": "python -m pip install --break-system-packages -r requirements.txt",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "website/client/dist",
   "rewrites": [
     {
@@ -14,7 +15,6 @@
   ],
   "functions": {
     "api/index.py": {
-      "runtime": "python3.12",
       "includeFiles": "data.json",
       "excludeFiles": "data/storage.db"
     }
