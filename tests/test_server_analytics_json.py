@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from chess_llm_eval.data.json_repo import JSONRepository
+from chess_llm_eval.schemas import AgentPuzzleOutcomeResponse, AnalyticsResponse
 from website.server.dependencies import get_repository
 from website.server.main import app
 
@@ -54,8 +55,17 @@ def test_analytics_endpoint_json_repo(client: TestClient) -> None:
     response = client.get("/api/analytics")
     assert response.status_code == 200
     data = response.json()
-    assert "rating_trends" in data
-    assert "puzzle_outcomes" in data
+    analytics = AnalyticsResponse.model_validate(data)
+    assert isinstance(analytics.rating_trends, list)
+    assert isinstance(analytics.puzzle_outcomes, list)
+    assert "weighted_puzzle_rating" in data
+    assert "weighted_puzzle_deviation" in data
+    assert data["weighted_puzzle_rating"] is None or isinstance(
+        data["weighted_puzzle_rating"], (int, float)
+    )
+    assert data["weighted_puzzle_deviation"] is None or isinstance(
+        data["weighted_puzzle_deviation"], (int, float)
+    )
 
 
 def test_agent_analytics_endpoint_json_repo(client: TestClient) -> None:
@@ -66,3 +76,7 @@ def test_agent_analytics_endpoint_json_repo(client: TestClient) -> None:
     """
     response = client.get("/api/analytics/agents/meta%2Fllama-3.1-405b-instruct")
     assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    for item in data:
+        AgentPuzzleOutcomeResponse.model_validate(item)

@@ -1,14 +1,21 @@
 """Build script to convert SQLite database to JSON for Vercel deployment."""
 
+import argparse
 import json
 import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
 
+from chess_llm_eval.data.json_repo import JSONRepository
+from chess_llm_eval.schemas import AnalyticsResponse
+from website.server.analytics import build_analytics_response
+
 
 def convert_sqlite_to_json(
-    db_path: str = "data/storage.db", output_path: str = "data.json"
+    db_path: str = "data/storage.db",
+    output_path: str = "data.json",
+    validate: bool = False,
 ) -> None:
     """Convert SQLite database to JSON format for serverless deployment.
 
@@ -58,6 +65,18 @@ def convert_sqlite_to_json(
         sys.exit(1)
 
     conn.close()
+
+    if validate:
+        validate_json_output(output_path)
+
+
+def validate_json_output(output_path: str) -> None:
+    """Validate generated JSON against API schemas."""
+    print("  Validating JSON output against schemas...")
+    repository = JSONRepository(output_path)
+    response = build_analytics_response(repository)
+    AnalyticsResponse.model_validate(response.model_dump())
+    print("  Schema validation passed.")
 
 
 def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
@@ -139,4 +158,18 @@ def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    convert_sqlite_to_json()
+    parser = argparse.ArgumentParser(description="Build JSON data for Vercel deployment.")
+    parser.add_argument("--db-path", default="data/storage.db")
+    parser.add_argument("--output-path", default="data.json")
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="Validate JSON output against API schemas.",
+    )
+    args = parser.parse_args()
+
+    convert_sqlite_to_json(
+        db_path=args.db_path,
+        output_path=args.output_path,
+        validate=args.validate,
+    )
