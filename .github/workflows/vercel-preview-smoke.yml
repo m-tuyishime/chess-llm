@@ -1,7 +1,7 @@
 name: Vercel Preview Smoke
 
 on:
-  deployment_status:
+  workflow_dispatch:
 
 jobs:
   preview-smoke:
