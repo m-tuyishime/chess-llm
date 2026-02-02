@@ -103,8 +103,8 @@ def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
     cursor = conn.execute("""
         SELECT
             p.type,
-            COUNT(*) as total,
-            SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) as solved
+            SUM(CASE WHEN g.failed = 0 THEN 1 ELSE 0 END) as successes,
+            SUM(CASE WHEN g.failed = 1 THEN 1 ELSE 0 END) as failures
         FROM puzzle p
         JOIN game g ON p.id = g.puzzle_id
         GROUP BY p.type
@@ -115,7 +115,7 @@ def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
     cursor = conn.execute("""
         SELECT
             g.agent_name,
-            SUM(CASE WHEN m.illegal_move = 1 THEN 1 ELSE 0 END) as illegal_count,
+            SUM(CASE WHEN m.illegal_move = 1 THEN 1 ELSE 0 END) as illegal_moves_count,
             COUNT(m.id) as total_moves
         FROM game g
         JOIN move m ON g.id = m.game_id
@@ -127,8 +127,8 @@ def compute_analytics(conn: sqlite3.Connection) -> dict[str, Any]:
     cursor = conn.execute("""
         SELECT
             g.agent_name,
-            AVG(m.prompt_tokens) as avg_prompt_tokens,
-            AVG(m.completion_tokens) as avg_completion_tokens
+            AVG(m.prompt_tokens) as avg_puzzle_prompt_tokens,
+            AVG(m.completion_tokens) as avg_puzzle_completion_tokens
         FROM game g
         JOIN move m ON g.id = m.game_id
         GROUP BY g.agent_name

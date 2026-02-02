@@ -290,11 +290,15 @@ class JSONRepository(GameRepository):
 
     def get_benchmark_data(self) -> pd.DataFrame:
         """Get benchmark data as DataFrame."""
-        return self.benchmarks_df.merge(
-            self.games_df[["id", "agent_name"]],
+        merged = self.benchmarks_df.merge(
+            self.games_df[["id", "agent_name", "date"]],
             left_on="game_id",
             right_on="id",
         )
+        merged = merged.sort_values("id_x").copy()
+        merged["evaluation_index"] = merged.groupby("agent_name").cumcount() + 1
+        merged["date"] = pd.to_datetime(merged["date"], errors="coerce")
+        return merged
 
     def get_puzzle_outcome_data(self) -> pd.DataFrame:
         """Get puzzle outcome data."""
@@ -328,7 +332,10 @@ class JSONRepository(GameRepository):
     def get_illegal_moves_data(self) -> pd.DataFrame:
         """Get illegal moves data."""
         if "illegal_moves" in self.analytics:
-            return pd.DataFrame(self.analytics["illegal_moves"])
+            df = pd.DataFrame(self.analytics["illegal_moves"])
+            if "illegal_count" in df.columns and "illegal_moves_count" not in df.columns:
+                df = df.rename(columns={"illegal_count": "illegal_moves_count"})
+            return df
 
         return (
             self.moves_df.merge(
@@ -337,7 +344,10 @@ class JSONRepository(GameRepository):
                 right_on="id",
             )
             .groupby("agent_name")
-            .agg({"illegal_move": "sum"})
+            .agg(
+                illegal_moves_count=("illegal_move", "sum"),
+                total_moves=("illegal_move", "count"),
+            )
             .reset_index()
         )
 
@@ -387,7 +397,15 @@ class JSONRepository(GameRepository):
     def get_token_usage_per_move_data(self) -> pd.DataFrame:
         """Get token usage per move."""
         if "token_usage" in self.analytics:
-            return pd.DataFrame(self.analytics["token_usage"])
+            df = pd.DataFrame(self.analytics["token_usage"])
+            if "avg_prompt_tokens" not in df.columns and "avg_puzzle_prompt_tokens" in df.columns:
+                df = df.rename(
+                    columns={
+                        "avg_puzzle_prompt_tokens": "avg_prompt_tokens",
+                        "avg_puzzle_completion_tokens": "avg_completion_tokens",
+                    }
+                )
+            return df
 
         return (
             self.moves_df.merge(
@@ -402,6 +420,17 @@ class JSONRepository(GameRepository):
 
     def get_token_usage_per_puzzle_data(self) -> pd.DataFrame:
         """Get token usage per puzzle."""
+        if "token_usage" in self.analytics:
+            df = pd.DataFrame(self.analytics["token_usage"])
+            if "avg_puzzle_prompt_tokens" not in df.columns and "avg_prompt_tokens" in df.columns:
+                df = df.rename(
+                    columns={
+                        "avg_prompt_tokens": "avg_puzzle_prompt_tokens",
+                        "avg_completion_tokens": "avg_puzzle_completion_tokens",
+                    }
+                )
+            return df
+
         return (
             self.moves_df.merge(
                 self.games_df[["id", "agent_name", "puzzle_id"]],
@@ -413,6 +442,12 @@ class JSONRepository(GameRepository):
             .groupby("agent_name")
             .mean()
             .reset_index()
+            .rename(
+                columns={
+                    "prompt_tokens": "avg_puzzle_prompt_tokens",
+                    "completion_tokens": "avg_puzzle_completion_tokens",
+                }
+            )
         )
 
     def get_solutionary_moves_data(self) -> pd.DataFrame:
