@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "lint:file": "eslint --report-unused-disable-directives --max-warnings 0",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest"
   },

@@ -31,7 +31,7 @@ import { RatingTrendsChart } from '../components/charts/RatingTrendsChart';
 export function AgentDetail() {
   const { t } = useTranslation();
   const params = useParams();
-  const name = params['*'];
+  const name = params['*'] ? decodeURIComponent(params['*']) : undefined;
   const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentDetailResponse | null>(null);
   const [agentAnalytics, setAgentAnalytics] = useState<AgentPuzzleOutcomeResponse[]>([]);
@@ -233,7 +233,7 @@ export function AgentDetail() {
             description="Progression of Glicko-2 rating over time"
             icon={<TrendingUp size={20} />}
           >
-            <RatingTrendsChart data={ratingHistory} />
+            <RatingTrendsChart data={ratingHistory} showConfidence />
           </ChartCard>
         )}
       </div>

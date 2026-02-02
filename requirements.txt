@@ -1,10 +1,4 @@
-python-chess
-pandas
-matplotlib
-numpy
-glicko2
-aiolimiter
-openai
 fastapi
 uvicorn
 pydantic
+pandas

@@ -19,6 +19,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 interface RatingTrendsChartProps {
   data: BenchmarkDataResponse[];
+  showConfidence?: boolean;
 }
 
 /**
@@ -26,14 +27,27 @@ interface RatingTrendsChartProps {
  * Uses BenchmarkDataResponse from the API.
  * @param props - Component props
  * @param props.data - The rating trends data
+ * @param props.showConfidence - Whether to render a confidence band around the line
  */
-export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) => {
+export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({
+  data,
+  showConfidence = false,
+}) => {
+  const toRgba = (hex: string, alpha: number) => {
+    const normalized = hex.replace('#', '');
+    const bigint = parseInt(normalized, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   // Memoize datasets calculation to avoid heavy lifting on every render
   const datasets = useMemo(() => {
     // Group data by agent
     const agents = Array.from(new Set(data.map((d) => d.agent_name)));
 
-    return agents.map((agent, index) => {
+    return agents.flatMap((agent, index) => {
       const agentData = data
         .filter((d) => d.agent_name === agent)
         .sort((a, b) => a.evaluation_index - b.evaluation_index);
@@ -61,6 +75,49 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
       ];
       const color = colors[index % colors.length];
 
+      if (showConfidence) {
+        const lowerBand = agentData.map((d) => ({
+          x: d.evaluation_index,
+          y: d.agent_rating - d.agent_deviation * 2,
+        }));
+        const upperBand = agentData.map((d) => ({
+          x: d.evaluation_index,
+          y: d.agent_rating + d.agent_deviation * 2,
+        }));
+
+        return [
+          {
+            label: `${agent} confidence lower`,
+            data: lowerBand,
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            pointRadius: 0,
+            tension: 0.3,
+            fill: false,
+          },
+          {
+            label: `${agent} confidence`,
+            data: upperBand,
+            borderColor: 'transparent',
+            backgroundColor: toRgba(color, 0.12),
+            pointRadius: 0,
+            tension: 0.3,
+            fill: '-1',
+          },
+          {
+            label: agent,
+            data: dataPoints,
+            borderColor: color,
+            backgroundColor: color + '33', // 20% opacity
+            tension: 0.3,
+            borderWidth: 2,
+            pointRadius: 0, // Hide points by default for performance and clarity
+            pointHoverRadius: 5, // Show point on hover
+            spanGaps: true,
+          },
+        ];
+      }
+
       return {
         label: agent,
         data: dataPoints,
@@ -73,7 +130,7 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({ data }) =>
         spanGaps: true,
       };
     });
-  }, [data]);
+  }, [data, showConfidence]);
 
   const chartData: ChartData<'line'> = {
     datasets,

@@ -40,6 +40,9 @@ jobs:
       - name: Test with pytest
         run: uv run pytest
 
+      - name: Validate JSON build
+        run: python build.py --validate
+
   website-quality:
     name: Website Quality (Lint, Type Check)
     runs-on: ubuntu-latest

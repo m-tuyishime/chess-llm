@@ -1,9 +1,28 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "python -m pip install --break-system-packages -r requirements.txt",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "website/client/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "data.json",
+      "excludeFiles": "data/storage.db"
+    }
+  },
+  "env": {
+    "CHESS_REPO_TYPE": "json",
+    "CHESS_JSON_PATH": "data.json",
+    "UV_LINK_MODE": "copy",
+    "UV_PYTHON": "3.12"
+  }
 }
