@@ -41,6 +41,10 @@
       "outcome": "Outcome",
       "moves": "Moves",
       "date": "Date"
+    },
+    "pagination": {
+      "previous": "Previous Page",
+      "next": "Next Page"
     }
   },
   "replay": {

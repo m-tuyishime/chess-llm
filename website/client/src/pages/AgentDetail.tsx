@@ -362,14 +362,14 @@ export function AgentDetail() {
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
-                {t('replay.controls.prev')}
+                {t('agentDetail.pagination.previous')}
               </button>
               <button
                 className="btn btn-sm btn-outline"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               >
-                {t('replay.controls.next')}
+                {t('agentDetail.pagination.next')}
               </button>
             </div>
           </div>
