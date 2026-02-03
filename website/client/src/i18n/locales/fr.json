@@ -41,6 +41,10 @@
       "outcome": "Résultat",
       "moves": "Coups",
       "date": "Date"
+    },
+    "pagination": {
+      "previous": "Page précédente",
+      "next": "Page suivante"
     }
   },
   "replay": {
