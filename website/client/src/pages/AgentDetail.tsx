@@ -431,6 +431,7 @@ function StatCard({
   subValue?: string;
   color?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={`card stat-card color-${color}`}>
       <div className="stat-header">
