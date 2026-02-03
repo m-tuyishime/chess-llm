@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { Navbar } from './components/Navbar';
 import { Leaderboard } from './pages/Leaderboard';
@@ -11,6 +12,7 @@ import { Analytics } from './pages/Analytics';
  * Layout wrapper to handle conditional rendering of Navbar and Footer.
  */
 function AppLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const isReplayPage = location.pathname.startsWith('/replay');
 
@@ -37,7 +39,7 @@ function AppLayout() {
             paddingBottom: '2rem',
           }}
         >
-          Chess LLM Arena
+          {t('common.appName')}
         </footer>
       )}
     </div>

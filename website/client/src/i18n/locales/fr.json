@@ -220,7 +220,8 @@
     "error": "Erreur",
     "retry": "Réessayer",
     "loading": "Chargement...",
-    "noData": "Aucune donnée disponible"
+    "noData": "Aucune donnée disponible",
+    "appName": "Chess LLM Arena"
   },
   "colors": {
     "white": "Blancs",
