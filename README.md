@@ -8,44 +8,51 @@ The primary goal was to systematically evaluate LLM performance across varying p
 
 ## Key Features & Highlights
 
-- **Glicko-2 Rating:** Utilizes the Glicko-2 rating system for statistically sound performance comparison and estimation of playing strength[cite: 412, 456].
+- **Live Website:** Interactive web interface available at [chessllm.tuyishime.ca](https://chessllm.tuyishime.ca) for exploring leaderboards, agent performance, and game replays.
+- **Glicko-2 Rating:** Utilizes the Glicko-2 rating system for statistically sound performance comparison and estimation of playing strength.
 - **Modular Architecture:** Built with a modular design featuring distinct components for agents (LLM, Stockfish, Random), chess environment simulation (`ChessEnv`), evaluation orchestration (`Evaluator`), data management (`DatabaseManager`), puzzle selection (`PuzzleSelector`), API interaction (`Router`), and report generation (`ReportGenerator`).
 - **Asynchronous Processing:** Leverages Python's `asyncio` for efficient parallel evaluation of multiple LLMs and handling of API calls.
 - **API Management:** Includes components for managing API keys, routing requests to different providers (e.g., OpenRouter, Nvidia NIM), and handling rate limits (`AsyncLimiter`).
 - **Constraint Handling:** Demonstrated adaptability by overcoming budget limitations and API restrictions through strategic selection of models and platforms (e.g., shifting to Nvidia NIM for free access to open-source models).
-- **Reproducibility:** Uses Docker to ensure a consistent execution environment for reliable and reproducible results.
 - **Data Storage:** Employs SQLite for efficient data storage and retrieval, with a schema designed to accommodate various evaluation metrics and results.
+
+## Exploring Results
+
+Visit the live website at **[chessllm.tuyishime.ca](https://chessllm.tuyishime.ca)** to:
+
+- View the **Leaderboard** of LLM chess agents ranked by Glicko-2 rating
+- Explore detailed **Agent Performance** breakdowns by puzzle type
+- Watch **Game Replays** with move-by-move analysis
+- Analyze **Performance Trends** and rating evolution
 
 ## Setup Instructions
 
 1.  **Prerequisites:**
-    - [Visual Studio Code (VS Code)](https://code.visualstudio.com/download)
-    - [Docker](https://docs.docker.com/get-docker/)
+    - Python 3.11+
+    - [uv](https://docs.astral.sh/uv/) package manager
 2.  **Clone Repository:**
     ```bash
     git clone <your-repository-url>
     cd <repository-directory>
     ```
-3.  **Configure Environment Variables:**
-    - Copy `example.env` to `.env`:
+3.  **Install Dependencies:**
+    ```bash
+    uv sync
+    ```
+4.  **Configure Environment Variables:**
+    - Copy `.env.example` to `.env`:
       ```bash
-      cp example.env .env
+      cp .env.example .env
       ```
     - Edit `.env` and provide your API keys for `OPENROUTER_API_KEY` or `NIM_API_KEY`.
     - Ensure `STOCKFISH_PATH` points to your Stockfish executable and `DB_PATH` points to the desired database location (default is `data/storage.db`).
-    - Ensure the `TacticDB.csv`, `StrategicDB.csv`, and `EndgameDB.csv` files are present in this directory.
-4.  **Open in Dev Container:**
-    - Open the project folder in VS Code.
-    - Press `F1` or `Ctrl+Shift+P` to open the command palette.
-    - Run the command: `Dev Containers: Reopen in Container`.
-    - Wait for the container to build and install dependencies from `requirements.txt`.
 
 ## Running the Evaluation
 
-- The main script to run the evaluation is `evaluation.py`[cite: 604].
-- Execute it from the terminal within the Dev Container:
+- The evaluation script is located at `examples/scripts/run_evaluation.py`.
+- Execute it using `uv`:
   ```bash
-  python evaluation.py
+  uv run python examples/scripts/run_evaluation.py
   ```
 - The script will:
   - Initialize agents (LLMs, Stockfish, Random).
@@ -54,6 +61,7 @@ The primary goal was to systematically evaluate LLM performance across varying p
   - Handle API rate limits.
   - Record game details, moves (including illegal ones), token counts, and Glicko-2 rating updates to the SQLite database (`data/storage.db`).
   - Log progress and errors.
+- You can customize the script to evaluate different models or adjust evaluation parameters.
 
 ## Generating Reports
 

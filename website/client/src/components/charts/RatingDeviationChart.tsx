@@ -133,7 +133,8 @@ export const RatingDeviationChart: React.FC<RatingDeviationChartProps> = ({ data
           },
           title: {
             display: true,
-            text: 'Evaluation Index',
+            text:
+              document.documentElement.lang === 'fr' ? "Indice d'évaluation" : 'Evaluation Index',
             color: '#94a3b8',
             font: {
               size: 11,
@@ -153,7 +154,10 @@ export const RatingDeviationChart: React.FC<RatingDeviationChartProps> = ({ data
           },
           title: {
             display: true,
-            text: 'Rating Deviation (RD)',
+            text:
+              document.documentElement.lang === 'fr'
+                ? 'Déviation du classement (RD)'
+                : 'Rating Deviation (RD)',
             color: '#94a3b8',
             font: {
               size: 11,

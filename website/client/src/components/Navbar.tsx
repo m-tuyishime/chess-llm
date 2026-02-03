@@ -76,7 +76,9 @@ export function Navbar() {
             title={t('nav.toggleLanguage')}
           >
             <Languages size={20} />
-            <span style={{ fontSize: '0.8rem', marginLeft: '0.2rem' }}>{lang.toUpperCase()}</span>
+            <span style={{ fontSize: '0.8rem', marginLeft: '0.2rem' }}>
+              {lang === 'en' ? 'FR' : 'EN'}
+            </span>
           </button>
         </div>
       </div>

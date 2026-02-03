@@ -39,6 +39,7 @@ export class ChartErrorBoundary extends React.Component<
           }}
         >
           <strong>{this.props.title}</strong>
+          {/* eslint-disable-next-line i18next/no-literal-string */}
           <div style={{ marginTop: '0.5rem' }}>
             Chart failed to render. Check the browser console for details.
           </div>

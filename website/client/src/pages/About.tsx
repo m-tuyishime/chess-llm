@@ -138,7 +138,9 @@ export function About() {
               {t('about.team.authors')}
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-primary)' }}>
+              {/* eslint-disable-next-line i18next/no-literal-string */}
               <li style={{ padding: '0.25rem 0' }}>Muhoza Olivier Tuyishime</li>
+              {/* eslint-disable-next-line i18next/no-literal-string */}
               <li style={{ padding: '0.25rem 0' }}>William McAllister</li>
             </ul>
           </div>
@@ -148,6 +150,7 @@ export function About() {
               {t('about.team.supervisor')}
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-primary)' }}>
+              {/* eslint-disable-next-line i18next/no-literal-string */}
               <li style={{ padding: '0.25rem 0' }}>Alan Davoust</li>
             </ul>
           </div>

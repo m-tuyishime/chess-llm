@@ -188,7 +188,8 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({
           },
           title: {
             display: true,
-            text: 'Evaluation Index',
+            text:
+              document.documentElement.lang === 'fr' ? "Indice d'évaluation" : 'Evaluation Index',
             color: '#94a3b8',
             font: {
               size: 11,
@@ -207,7 +208,8 @@ export const RatingTrendsChart: React.FC<RatingTrendsChartProps> = ({
           },
           title: {
             display: true,
-            text: 'Glicko-2 Rating',
+            text:
+              document.documentElement.lang === 'fr' ? 'Classement Glicko-2' : 'Glicko-2 Rating',
             color: '#94a3b8',
             font: {
               size: 11,

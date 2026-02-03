@@ -27,6 +27,13 @@
     "winRate": "Win Rate",
     "isReasoning": "Reasoning Model",
     "isRandom": "Random Baseline",
+    "stats": {
+      "volatility": "Volatility",
+      "volatilitySubtitle": "Rating stability",
+      "evaluationIndex": "Evaluation Index",
+      "glickoRating": "Glicko-2 Rating",
+      "ratingDeviation": "Rating Deviation (RD)"
+    },
     "performanceBreakdown": "Performance Breakdown",
     "gameHistory": "Game History",
     "filters": {
@@ -41,7 +48,13 @@
       "outcome": "Outcome",
       "moves": "Moves",
       "date": "Date"
-    }
+    },
+    "pagination": {
+      "previous": "Previous Page",
+      "next": "Next Page",
+      "showing": "Showing {{start}} - {{end}} of {{total}}"
+    },
+    "statLabel": "Stat"
   },
   "replay": {
     "backToAgent": "Back to Agent",
@@ -77,6 +90,66 @@
       "notationError": "Notation Error",
       "illegalMove": "Illegal Move",
       "incorrectMove": "Incorrect Move"
+    },
+    "sidebar": {
+      "open": "Open Sidebar",
+      "close": "Close Sidebar",
+      "playingAs": "Playing as:",
+      "popularity": "Popularity",
+      "type": "Type",
+      "plays": "Plays",
+      "themes": "Themes",
+      "openingTags": "Opening Tags",
+      "openOnLichess": "Open",
+      "goToMove": "Go to move {{number}} {{color}} {{move}}"
+    },
+    "tooltips": {
+      "puzzleRating": "Puzzle rating (Glicko-2) based on solver performance.",
+      "popularity": "Popularity ranges from 100 to -100 and reflects weighted upvotes/downvotes.",
+      "puzzleCategory": "Puzzle category from Lichess (e.g., mate, advantage, equality).",
+      "lichessPlays": "Number of times this puzzle was played on Lichess.",
+      "tacticalMotifs": "Tactical motifs tagged by Lichess (e.g., fork, pin, skewer).",
+      "openingTags": "Opening tags are provided when the puzzle starts before move 20.",
+      "lichessOpening": "Opening classification tag from Lichess.",
+      "puzzleId": "Unique Lichess puzzle identifier.",
+      "moveHistoryList": "Chronological move list for this attempt. Click a move to jump to it."
+    },
+    "puzzleTypes": {
+      "mate": "Find a forced sequence leading to checkmate.",
+      "advantage": "Exploit a superior position to win material or gain a decisive advantage.",
+      "equality": "Find the only move that saves the game and maintains balance in a worse position.",
+      "tactic": "Precise sequence to gain an immediate advantage.",
+      "strategy": "Long-term plan based on positional considerations (pawn structure, strong squares).",
+      "endgame": "Final phase with reduced material. Precision and king activity are crucial.",
+      "middlegame": "Complex phase with most pieces. Combines tactical calculation and strategic planning.",
+      "opening": "Initial moves of the game. Goals: development, center control, and king safety."
+    },
+    "themes": {
+      "fork": "A single move attacks two or more pieces at once.",
+      "pin": "A piece cannot move because it would expose a more valuable piece.",
+      "skewer": "Attack a valuable piece so it must move, exposing a lesser piece.",
+      "discoveredattack": "Move a piece to reveal an attack from another piece.",
+      "doubleattack": "A move that creates two simultaneous threats.",
+      "sacrifice": "Give up material for a tactical gain.",
+      "attraction": "Lure a piece to a vulnerable square.",
+      "deflection": "Force a defender away from a key square or piece.",
+      "clearance": "Clear a square or file to enable a tactic.",
+      "interference": "Block a line between a piece and its target.",
+      "advantage": "Gain a winning or near-winning position.",
+      "equality": "Hold or restore a roughly equal position.",
+      "tactic": "A short tactical sequence to win material or mate.",
+      "strategy": "A longer-term plan to improve position or structure.",
+      "backrankmate": "Checkmate along the back rank with blocked escape squares.",
+      "smotheredmate": "Checkmate where the king is blocked by its own pieces.",
+      "mate": "A forced checkmate motif.",
+      "matein1": "Checkmate in one move.",
+      "matein2": "Checkmate in two moves.",
+      "matein3": "Checkmate in three moves.",
+      "perpetualcheck": "Force a draw by repeated checking.",
+      "zugzwang": "Any move worsens the position.",
+      "endgame": "Final phase with reduced material. Precision and king activity are crucial.",
+      "middlegame": "Complex phase with most pieces. Combines tactical calculation and strategic planning.",
+      "opening": "Initial moves of the game. Goals: development, center control, and king safety."
     }
   },
   "analytics": {
@@ -147,6 +220,11 @@
     "error": "Error",
     "retry": "Retry",
     "loading": "Loading...",
-    "noData": "No data available"
+    "noData": "No data available",
+    "appName": "Chess LLM Arena"
+  },
+  "colors": {
+    "white": "White",
+    "black": "Black"
   }
 }
