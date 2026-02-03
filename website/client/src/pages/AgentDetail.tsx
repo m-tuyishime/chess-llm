@@ -197,9 +197,9 @@ export function AgentDetail() {
         />
         <StatCard
           icon={<Activity size={20} className="text-purple" />}
-          label="Volatility"
+          label={t('agentDetail.stats.volatility')}
           value={agent.volatility.toFixed(3)}
-          subValue="Rating stability"
+          subValue={t('agentDetail.stats.volatilitySubtitle')}
           color="purple"
         />
       </div>
@@ -353,8 +353,11 @@ export function AgentDetail() {
         {totalPages > 1 && (
           <div className="pagination">
             <span className="pagination-info">
-              Showing {(currentPage - 1) * pageSize + 1} -{' '}
-              {Math.min(currentPage * pageSize, filteredGames.length)} of {filteredGames.length}
+              {t('agentDetail.pagination.showing', {
+                start: (currentPage - 1) * pageSize + 1,
+                end: Math.min(currentPage * pageSize, filteredGames.length),
+                total: filteredGames.length,
+              })}
             </span>
             <div className="pagination-controls">
               <button
@@ -432,7 +435,7 @@ function StatCard({
     <div className={`card stat-card color-${color}`}>
       <div className="stat-header">
         <div className={`stat-icon-wrapper`}>{icon}</div>
-        {subValue && <span className="stat-tag">Stat</span>}
+        {subValue && <span className="stat-tag">{t('agentDetail.statLabel')}</span>}
       </div>
       <div className="stat-content">
         <div className="stat-label">{label}</div>

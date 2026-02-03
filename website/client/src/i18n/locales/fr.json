@@ -22,11 +22,18 @@
   },
   "agentDetail": {
     "backToLeaderboard": "Retour au classement",
-    "rating": "Rating",
+    "rating": "Classement",
     "gamesPlayed": "Parties jouées",
     "winRate": "Taux de victoire",
     "isReasoning": "Modèle de raisonnement",
     "isRandom": "Référence aléatoire",
+    "stats": {
+      "volatility": "Volatilité",
+      "volatilitySubtitle": "Stabilité du classement",
+      "evaluationIndex": "Indice d'évaluation",
+      "glickoRating": "Classement Glicko-2",
+      "ratingDeviation": "Déviation du classement (RD)"
+    },
     "performanceBreakdown": "Détail des performances",
     "gameHistory": "Historique des parties",
     "filters": {
@@ -44,8 +51,10 @@
     },
     "pagination": {
       "previous": "Page précédente",
-      "next": "Page suivante"
-    }
+      "next": "Page suivante",
+      "showing": "Affichage de {{start}} - {{end}} sur {{total}}"
+    },
+    "statLabel": "Stat"
   },
   "replay": {
     "backToAgent": "Retour à l'agent",
@@ -81,6 +90,66 @@
       "notationError": "Erreur de notation",
       "illegalMove": "Coup illégal",
       "incorrectMove": "Coup incorrect"
+    },
+    "sidebar": {
+      "open": "Ouvrir le panneau",
+      "close": "Fermer le panneau",
+      "playingAs": "Joue en tant que :",
+      "popularity": "Popularité",
+      "type": "Type",
+      "plays": "Parties",
+      "themes": "Thèmes",
+      "openingTags": "Tags d'ouverture",
+      "openOnLichess": "Ouvrir",
+      "goToMove": "Aller au coup {{number}} {{color}} {{move}}"
+    },
+    "tooltips": {
+      "puzzleRating": "Classement du problème (Glicko-2) basé sur les performances des joueurs.",
+      "popularity": "La popularité varie de 100 à -100 et reflète les votes pondérés.",
+      "puzzleCategory": "Catégorie du problème de Lichess.",
+      "lichessPlays": "Nombre de fois que ce problème a été joué sur Lichess.",
+      "tacticalMotifs": "Motifs tactiques étiquetés par Lichess.",
+      "openingTags": "Les tags d'ouverture sont fournis lorsque le problème commence avant le coup 20.",
+      "lichessOpening": "Tag de classification d'ouverture de Lichess.",
+      "puzzleId": "Identifiant unique du problème Lichess.",
+      "moveHistoryList": "Liste chronologique des coups pour cette tentative. Cliquez sur un coup pour y accéder."
+    },
+    "puzzleTypes": {
+      "mate": "Trouvez une séquence forcée qui mène à l'échec et mat.",
+      "advantage": "Exploitez une position supérieure pour gagner du matériel ou obtenir un avantage décisif.",
+      "equality": "Trouvez le seul coup qui sauve la partie et maintient l'équilibre dans une position défavorable.",
+      "tactic": "Séquence combinatoire précise pour gagner un avantage immédiat.",
+      "strategy": "Plan à long terme basé sur des considérations positionnelles (structure de pions, cases fortes).",
+      "endgame": "Phase finale avec peu de pièces. La précision et l'activité du roi sont cruciales.",
+      "middlegame": "Phase complexe avec la plupart des pièces. Mêle calcul tactique et planification stratégique.",
+      "opening": "Premiers coups de la partie. Objectifs : développement, contrôle du centre et sécurité du roi."
+    },
+    "themes": {
+      "fork": "Un seul coup attaque deux pièces ou plus à la fois.",
+      "pin": "Une pièce ne peut pas bouger car elle exposerait une pièce plus précieuse.",
+      "skewer": "Attaquez une pièce précieuse pour qu'elle doive bouger, exposant une pièce moindre.",
+      "discoveredattack": "Bougez une pièce pour révéler une attaque d'une autre pièce.",
+      "doubleattack": "Un coup qui crée deux menaces simultanées.",
+      "sacrifice": "Abandonnez du matériel pour un gain tactique.",
+      "attraction": "Attirez une pièce vers une case vulnérable.",
+      "deflection": "Forcez un défenseur à quitter une case ou une pièce clé.",
+      "clearance": "Libérez une case ou une colonne pour permettre une tactique.",
+      "interference": "Bloquez une ligne entre une pièce et sa cible.",
+      "advantage": "Gagnez une position gagnante ou quasi-gagnante.",
+      "equality": "Maintenez ou restaurez une position à peu près égale.",
+      "tactic": "Une courte séquence tactique pour gagner du matériel ou donner le mat.",
+      "strategy": "Un plan à plus long terme pour améliorer la position ou la structure.",
+      "backrankmate": "Mat sur la dernière rangée avec cases de fuite bloquées.",
+      "smotheredmate": "Mat où le roi est bloqué par ses propres pièces.",
+      "mate": "Un motif de mat forcé.",
+      "matein1": "Mat en un coup.",
+      "matein2": "Mat en deux coups.",
+      "matein3": "Mat en trois coups.",
+      "perpetualcheck": "Forcez un nul par échecs répétés.",
+      "zugzwang": "Tout coup aggrave la position.",
+      "endgame": "Phase finale avec peu de pièces. La précision et l'activité du roi sont cruciales.",
+      "middlegame": "Phase complexe avec la plupart des pièces. Mêle calcul tactique et planification stratégique.",
+      "opening": "Premiers coups de la partie. Objectifs : développement, contrôle du centre et sécurité du roi."
     }
   },
   "analytics": {
@@ -152,5 +221,9 @@
     "retry": "Réessayer",
     "loading": "Chargement...",
     "noData": "Aucune donnée disponible"
+  },
+  "colors": {
+    "white": "Blancs",
+    "black": "Noirs"
   }
 }

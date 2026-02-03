@@ -93,7 +93,7 @@ export function MoveHistory({
       <div
         className="sidebar-section-header has-tooltip"
         style={{ background: 'var(--bg-app)' }}
-        data-tooltip="Chronological move list for this attempt. Click a move to jump to it."
+        data-tooltip={t('replay.tooltips.moveHistoryList')}
       >
         {t('replay.history.title')}
       </div>
@@ -124,7 +124,11 @@ export function MoveHistory({
                       <button
                         onClick={() => goToMove(white.index)}
                         className={`history-btn ${currentMoveIndex === white.index ? 'active' : ''} ${white.move.is_illegal ? 'illegal' : ''}`}
-                        aria-label={`Go to move ${row.number} white ${white.move.actual_move}`}
+                        aria-label={t('replay.sidebar.goToMove', {
+                          number: row.number,
+                          color: 'white',
+                          move: white.move.actual_move,
+                        })}
                       >
                         {white.move.actual_move}
                         {white.move.is_illegal && (
@@ -140,7 +144,11 @@ export function MoveHistory({
                       <button
                         onClick={() => goToMove(black.index)}
                         className={`history-btn ${currentMoveIndex === black.index ? 'active' : ''} ${black.move.is_illegal ? 'illegal' : ''}`}
-                        aria-label={`Go to move ${row.number} black ${black.move.actual_move}`}
+                        aria-label={t('replay.sidebar.goToMove', {
+                          number: row.number,
+                          color: 'black',
+                          move: black.move.actual_move,
+                        })}
                       >
                         {black.move.actual_move}
                         {black.move.is_illegal && (
